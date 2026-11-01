@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="36dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_jarvis_chip"
+    android:paddingStart="8dp"
+    android:paddingEnd="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginBottom="8dp">
+
+    <ImageView
+        android:id="@+id/ivAttachmentThumb"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_attach_file"
+        android:layout_marginEnd="6dp" />
+
+    <TextView
+        android:id="@+id/tvAttachmentName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:maxWidth="130dp"
+        android:singleLine="true"
+        android:ellipsize="middle"
+        android:text="File.kt"
+        android:textColor="?attr/themeTextPrimary"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif-medium"
+        android:layout_marginEnd="6dp" />
+
+    <ImageButton
+        android:id="@+id/btnRemoveAttachment"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_close"
+        app:tint="?attr/themeTextMuted"
+        android:contentDescription="Remove Attachment"
+        android:padding="2dp" />
+
+</LinearLayout>

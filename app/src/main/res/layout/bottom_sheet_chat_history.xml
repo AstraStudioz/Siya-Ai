@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_jarvis_card"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="24dp">
+
+    <!-- Drag Handle -->
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_jarvis_chip" />
+
+    <!-- Header with Title & New Chat Action -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="14dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Chat History"
+            android:textColor="?attr/themeTextPrimary"
+            android:textSize="18sp"
+            android:fontFamily="sans-serif-medium"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/btnHistoryNewChat"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/bg_jarvis_icon_square"
+            android:src="@drawable/ic_plus"
+            app:tint="?attr/themeTextPrimary"
+            android:scaleType="centerInside"
+            android:contentDescription="New Conversation" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvEmptyHistory"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="No previous conversations found"
+        android:textColor="?attr/themeTextMuted"
+        android:textSize="14sp"
+        android:paddingVertical="32dp"
+        android:visibility="gone" />
+
+    <!-- Sessions List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvChatSessions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="true"
+        android:maxHeight="420dp"
+        android:clipToPadding="false"
+        android:paddingBottom="8dp" />
+
+</LinearLayout>

@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/themeBg"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="100dp">
+
+    <!-- Top Navigation Header -->
+    <ImageButton
+        android:id="@+id/btnChatMenu"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="@drawable/bg_jarvis_icon_square"
+        android:src="@drawable/ic_menu"
+        app:tint="?attr/themeTextPrimary"
+        android:contentDescription="Chat History"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/layoutChatHeader"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintTop_toTopOf="@id/btnChatMenu"
+        app:layout_constraintBottom_toBottomOf="@id/btnChatMenu"
+        app:layout_constraintStart_toEndOf="@id/btnChatMenu"
+        app:layout_constraintEnd_toStartOf="@id/btnChatTerminal">
+
+        <TextView
+            android:id="@+id/tvChatTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hi"
+            android:textColor="?attr/themeTextPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/tvChatSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Siya Ai • Gemini Live • Active"
+            android:textColor="?attr/themeTextMuted"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif" />
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/btnChatTerminal"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="@drawable/bg_jarvis_icon_square"
+        android:src="@drawable/ic_terminal"
+        app:tint="?attr/themeTextPrimary"
+        android:contentDescription="Terminal"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnChatNew" />
+
+    <ImageButton
+        android:id="@+id/btnChatNew"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:background="@drawable/bg_jarvis_icon_square"
+        android:src="@drawable/ic_plus"
+        app:tint="?attr/themeTextPrimary"
+        android:contentDescription="New Conversation"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Chat Messages List -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvChatMessages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="12dp"
+        app:layout_constraintTop_toBottomOf="@id/layoutChatHeader"
+        app:layout_constraintBottom_toTopOf="@id/cardInputContainer" />
+
+    <!-- Clean Bottom Message Input Container -->
+    <LinearLayout
+        android:id="@+id/cardInputContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_jarvis_card"
+        android:padding="14dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <!-- Auto-switch notification banner -->
+        <TextView
+            android:id="@+id/tvAutoSwitchBanner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Switched to Code • tap Siya to undo"
+            android:textColor="?attr/themeTextMuted"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif"
+            android:visibility="gone"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:paddingBottom="6dp" />
+
+        <!-- Staging strip for attachments -->
+        <HorizontalScrollView
+            android:id="@+id/layoutAttachmentPreview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:scrollbars="none"
+            android:fillViewport="true"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:id="@+id/layoutAttachmentContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+
+        <EditText
+            android:id="@+id/etMessageInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Message Siya"
+            android:textColorHint="?attr/themeTextMuted"
+            android:textColor="?attr/themeTextPrimary"
+            android:textSize="15sp"
+            android:fontFamily="sans-serif"
+            android:background="@null"
+            android:minLines="1"
+            android:maxLines="4"
+            android:inputType="textCapSentences|textMultiLine"
+            android:paddingBottom="12dp" />
+
+        <!-- Clean Action Row: Model Picker Button, Attach, Send -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Merged Single Model / Mode Button -->
+            <LinearLayout
+                android:id="@+id/btnModelPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_chip_selected"
+                android:paddingStart="12dp"
+                android:paddingEnd="10dp"
+                android:clickable="true"
+                android:focusable="true">
+
+                <ImageView
+                    android:id="@+id/ivCurrentModelIcon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_nav_chat"
+                    app:tint="?attr/themeAccent"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="Model Icon" />
+
+                <TextView
+                    android:id="@+id/tvCurrentModelName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Siya"
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:src="@drawable/ic_widget_chevron_right"
+                    android:rotation="90"
+                    app:tint="?attr/themeTextMuted"
+                    android:layout_marginStart="4dp"
+                    android:contentDescription="Select Model" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <!-- Plus attachment button -->
+            <ImageButton
+                android:id="@+id/btnAttach"
+                android:layout_width="38dp"
+                android:layout_height="38dp"
+                android:background="@null"
+                android:src="@drawable/ic_plus"
+                app:tint="?attr/themeTextSecondary"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="Attach" />
+
+            <!-- Send Button -->
+            <ImageButton
+                android:id="@+id/btnSendMessage"
+                android:layout_width="44dp"
+                android:layout_height="44dp"
+                android:background="@drawable/bg_jarvis_pill_button"
+                android:src="@drawable/ic_send_up"
+                app:tint="#FFFFFF"
+                android:contentDescription="Send" />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

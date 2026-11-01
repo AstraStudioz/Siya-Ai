@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_glass_22dp"
+    android:clickable="true"
+    android:contentDescription="@string/widget_desc_open_app"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="8dp"
+    android:paddingTop="3dp"
+    android:paddingEnd="10dp"
+    android:paddingBottom="3dp">
+
+    <ImageView
+        android:id="@+id/iv_character"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:contentDescription="@string/widget_desc_character"
+        android:scaleType="fitCenter"
+        android:src="@drawable/widget_siya_character" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_quote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:text="“Small steps create big dreams.”"
+            android:textColor="@color/widget_text_primary"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tv_author"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:gravity="end"
+            android:maxLines="1"
+            android:text="@string/widget_quote_author"
+            android:textColor="@color/widget_text_secondary"
+            android:textSize="10sp" />
+    </LinearLayout>
+</LinearLayout>

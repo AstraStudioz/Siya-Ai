@@ -1,0 +1,590 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/themeBg"
+    android:orientation="vertical">
+
+    <!-- Top App Bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="14dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Back"
+            app:tint="?attr/themeTextPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/tvHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="VOICE BIOMETRICS"
+            android:textColor="?attr/themeTextPrimary"
+            android:textSize="17sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-black"
+            android:letterSpacing="0.12"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchOwnerOnly"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="32dp">
+
+            <!-- Model Status Warning Banner (Shown if speaker model is not READY) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardModelStatusWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/status_amber"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:id="@+id/tvModelWarningTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SPEAKER MODEL NOT READY"
+                        android:textColor="@color/status_amber"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvModelWarningDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Speaker recognition model (final.ext.raw) is missing or loading. Voice enrollment is unavailable. Normal voice commands will proceed without blocking."
+                        android:textColor="?attr/themeTextSecondary"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="2dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Status Banner Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="@color/border_subtle"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <View
+                            android:id="@+id/viewStatusDot"
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:background="@drawable/circle_cyan" />
+
+                        <TextView
+                            android:id="@+id/tvEnrollmentStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="10dp"
+                            android:layout_weight="1"
+                            android:text="OWNER VOICE: ACTIVE"
+                            android:textColor="?attr/themeAccent"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="0.08" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvStatusDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Calibrated to your voice. Convenience lock filters background voices and reduces stranger speech pickup."
+                        android:textColor="?attr/themeTextSecondary"
+                        android:textSize="13sp"
+                        android:lineSpacingExtra="3dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Realistic Disclaimer Note -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_jarvis_chip"
+                android:padding="12dp"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_settings_shield"
+                    app:tint="?attr/themeAccent"
+                    android:layout_marginEnd="10dp"
+                    android:contentDescription="Shield" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Voice matching reduces accidental use by other people. It is not a lock: a close relative or a recording can sometimes pass. Sensitive actions need extra confirmation."
+                    android:textColor="?attr/themeTextMuted"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp" />
+            </LinearLayout>
+
+            <!-- Enrollment Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardEnrollment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/themeCardBg"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/themeCardBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/tvStepIndicator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TRAIN STEP 1 OF 5"
+                        android:textColor="?attr/themeAccent"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.15" />
+
+                    <TextView
+                        android:id="@+id/tvPromptInstruction"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Say clearly into your phone (4-6 seconds):"
+                        android:textColor="?attr/themeTextSecondary"
+                        android:textSize="13sp" />
+
+                    <TextView
+                        android:id="@+id/tvPromptPhrase"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center"
+                        android:text="&quot;Hey Siya, wake up and check my notifications&quot;"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <!-- Live Audio Level Meter -->
+                    <ProgressBar
+                        android:id="@+id/progressLiveLevel"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="16dp"
+                        android:max="100"
+                        android:progress="0"
+                        android:progressTint="?attr/themeAccent"
+                        android:visibility="gone" />
+
+                    <!-- Big Record Button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRecordSample"
+                        android:layout_width="wrap_content"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="18dp"
+                        android:paddingHorizontal="28dp"
+                        android:text="TAP &amp; SPEAK PHRASE"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        app:backgroundTint="?attr/themeAccent"
+                        app:cornerRadius="28dp" />
+
+                    <TextView
+                        android:id="@+id/tvRecordFeedback"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:text="Tap to start recording sample 1"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="12sp" />
+
+                    <!-- Voice Profile Quality Label -->
+                    <TextView
+                        android:id="@+id/tvVoiceProfileQuality"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Voice profile quality: Fair"
+                        android:textColor="?attr/themeAccent"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:visibility="gone" />
+
+                    <!-- Step Checkmarks (5 Samples) -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:gravity="center"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvStep1Dot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="① Sample 1"
+                            android:textColor="?attr/themeAccent"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvStep2Dot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="② Sample 2"
+                            android:textColor="?attr/themeTextMuted"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvStep3Dot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="③ Sample 3"
+                            android:textColor="?attr/themeTextMuted"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvStep4Dot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="④ Sample 4"
+                            android:textColor="?attr/themeTextMuted"
+                            android:textSize="11sp" />
+
+                        <TextView
+                            android:id="@+id/tvStep5Dot"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:text="⑤ Sample 5"
+                            android:textColor="?attr/themeTextMuted"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Test Voice Section (2D) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/themeCardBg"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/themeCardBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TEST MY VOICE"
+                        android:textColor="?attr/themeAccent"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Speak for ~4 seconds to test your voice recognition. Ask someone else to try too to test rejection."
+                        android:textColor="?attr/themeTextSecondary"
+                        android:textSize="12sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTestVoice"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:layout_marginTop="12dp"
+                        android:text="TEST VOICE MATCH (SPEAK NOW)"
+                        android:textColor="?attr/themeAccent"
+                        app:strokeColor="?attr/themeAccent"
+                        app:strokeWidth="1.5dp"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <!-- Test Result Container -->
+                    <LinearLayout
+                        android:id="@+id/layoutTestResult"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_jarvis_card"
+                        android:orientation="vertical"
+                        android:padding="12dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tvTestVerdict"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="VERDICT: OWNER"
+                            android:textColor="@color/status_green"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <!-- Match Strength Bar -->
+                        <TextView
+                            android:id="@+id/tvMatchStrengthLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Match Strength: 85%"
+                            android:textColor="?attr/themeTextSecondary"
+                            android:textSize="12sp" />
+
+                        <ProgressBar
+                            android:id="@+id/progressMatchStrength"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:layout_marginTop="4dp"
+                            android:max="100"
+                            android:progress="85"
+                            android:progressTint="@color/status_green" />
+
+                        <TextView
+                            android:id="@+id/tvTestDetails"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Cosine distance: 0.28 (Calibrated T: 0.65)"
+                            android:textColor="?attr/themeTextSecondary"
+                            android:textSize="11sp" />
+
+                        <!-- Suggestion if rejected > 2 in last 5 -->
+                        <TextView
+                            android:id="@+id/tvSuggestionRelaxed"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Tip: Frequent rejections detected. Consider selecting 'Relaxed' sensitivity."
+                            android:textColor="@color/status_amber"
+                            android:textSize="11sp"
+                            android:visibility="gone" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnClearTestHistory"
+                            style="@style/Widget.Material3.Button.TextButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:text="Clear History"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Adaptive Voice Profile Card (2C) -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/themeCardBg"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/themeCardBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Improve profile automatically"
+                            android:textColor="?attr/themeTextPrimary"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/switchAdaptiveProfile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Gradually learns variations in your daily speech tone (keeps last 20 high-confidence samples)."
+                        android:textColor="?attr/themeTextSecondary"
+                        android:textSize="12sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnResetAdaptation"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Reset adaptation to original samples"
+                        android:textColor="?attr/themeAccent"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Strictness / Sensitivity Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardBackgroundColor="?attr/themeCardBg"
+                app:cardCornerRadius="16dp"
+                app:strokeColor="?attr/themeCardBorder"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SENSITIVITY / STRICTNESS"
+                        android:textColor="?attr/themeAccent"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.1" />
+
+                    <RadioGroup
+                        android:id="@+id/rgSensitivity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp">
+
+                        <RadioButton
+                            android:id="@+id/rbStrict"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Strict (T - 0.06: high security)"
+                            android:textColor="?attr/themeTextPrimary"
+                            android:textSize="13sp" />
+
+                        <RadioButton
+                            android:id="@+id/rbBalanced"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="Balanced (Calibrated T: recommended)"
+                            android:textColor="?attr/themeTextPrimary"
+                            android:textSize="13sp" />
+
+                        <RadioButton
+                            android:id="@+id/rbRelaxed"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Relaxed (T + 0.06: forgiving in noisy environments)"
+                            android:textColor="?attr/themeTextPrimary"
+                            android:textSize="13sp" />
+                    </RadioGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Reset Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnClearProfile"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:text="RESET / RE-ENROLL VOICE PROFILE"
+                android:textColor="@color/status_red"
+                app:strokeColor="@color/status_red"
+                app:strokeWidth="1dp"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/themeBg">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="36dp"
+            android:paddingBottom="48dp">
+
+            <!-- Top Header Bar -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="20dp">
+
+                <ImageButton
+                    android:id="@+id/btnBack"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_jarvis_icon_square"
+                    android:src="@drawable/ic_back"
+                    app:tint="?attr/themeTextPrimary"
+                    android:contentDescription="Back" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_marginStart="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Privacy &amp; Data Shield"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Zero-middleman architecture • On-device security"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Section 1: Intro & Last Updated -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1. INTRODUCTION &amp; CORE PRINCIPLE"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Last Updated: October 2026"
+                    android:textColor="?attr/themeTextMuted"
+                    android:textSize="11sp"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Siya AI is engineered with a strict 'Zero-Middleman' privacy architecture. We do NOT run an intermediary cloud server, database, or analytics tracking network. Your data stays on your personal device, and generative AI queries connect directly from your phone to Google Gemini API servers using your configured credentials."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13.5sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 2: Data Collected -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2. DATA PROCESSED &amp; COLLECTED"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Voice &amp; Microphone: Real-time audio stream is sampled at 16kHz exclusively when active conversation or wake-word listening is triggered.\n\n• Camera &amp; Vision: Video frames are captured and analyzed ONLY when you explicitly open the Camera screen.\n\n• Device Contacts: Names and numbers are read locally on-device to execute voice-dialing and WhatsApp automation.\n\n• Precise Location: Used on-demand to fetch local weather reports and sunrise/sunset timings.\n\n• Chat History &amp; Memories: Multi-session chat conversations and learned facts are saved locally in private Room databases.\n\n• Screen Capture &amp; Accessibility: Utilized only with explicit user permission to perform automated UI grounding actions."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 3: Permissions -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3. PERMISSION JUSTIFICATIONS"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• RECORD_AUDIO: Required for wake-word activation, conversational speech recognition, and on-device speaker verification.\n\n• CAMERA: Required to examine objects, documents, and surroundings when vision mode is active.\n\n• READ_CONTACTS: Required to find phone numbers when you say 'Call [Name]' or 'WhatsApp [Name]'.\n\n• ACCESS_FINE_LOCATION: Required to query localized weather forecasts.\n\n• SYSTEM_ALERT_WINDOW: Required to render the floating interactive assistant orb.\n\n• BIND_ACCESSIBILITY_SERVICE: Required to assist with task automation by finding and tapping screen controls."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 4: Data Routing (Local vs Cloud) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4. DATA ROUTING: LOCAL VS CLOUD"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="• Local On-Device: Vosk wake-word recognition, acoustic speaker verification, chat memory databases, contact matching, and preferences run 100% locally.\n\n• Cloud AI (Google Gemini): Audio, text, and camera images stream over encrypted TLS WebSocket and HTTPS directly to Google's Gemini servers under Google's Cloud API Terms. No proxy server operates in between.\n\n• YouTube &amp; Third-Party: Video playback uses Google's standard YouTube Android Player API."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 5: Voiceprint Storage -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5. BIOMETRIC VOICEPRINT ENCRYPTION"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Your voice acoustic vectors (128-dimensional x-vectors) are encrypted directly in the Android Keystore using AES-256-GCM via EncryptedSharedPreferences. Biometric voiceprints are NEVER transmitted over the internet, never backed up to cloud accounts, and never shared."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 6: Retention & Deletion -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="6. DATA RETENTION &amp; DELETION"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="You retain total control over your data. All chat sessions, memories, and voice enrollments reside strictly on your phone and can be individually deleted or completely purged at any time using the data management tools below."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 7: User Rights -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="7. USER RIGHTS &amp; ACCESS"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Under applicable privacy frameworks (including GDPR, CCPA, and India DPDP), you have the right to access, inspect, export, and erase all personal records held in the application at any moment without penalty."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 8: Children's Privacy -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="8. CHILDREN'S PRIVACY"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Siya AI is not directed toward children under 13 years of age. We do not knowingly solicit or collect personal information from minors. If you believe a minor has enrolled without parental guidance, use the 'Delete All My Data' button below to erase all stored profiles."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 9: Security Architecture -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="9. SECURITY SAFEGUARDS"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Security measures include: hardware keystore encryption, scoped private sandbox storage, TLS 1.3 transport security for all external Gemini API calls, and zero telemetry analytics trackers."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 10: Policy Changes -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10. POLICY REVISIONS"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Any updates to this privacy policy will be posted on this screen along with a revised effective date. Major architectural changes will be highlighted directly in app release updates."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp" />
+            </LinearLayout>
+
+            <!-- Section 11: Contact & Support -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="18dp"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="11. CONTACT &amp; COMMUNITY"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:layout_marginBottom="10dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="For questions regarding this policy or to request privacy inquiries, join our community discussion on Telegram or contact the developer directly."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Official Telegram Channel -->
+                <LinearLayout
+                    android:id="@+id/btnJoinOfficialTelegram"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingVertical="10dp"
+                    android:background="@drawable/bg_jarvis_row_item"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/ic_social_telegram"
+                        android:contentDescription="Telegram" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="12dp"
+                        android:text="Official Telegram Channel"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_arrow_right"
+                        app:tint="?attr/themeTextMuted"
+                        android:contentDescription="Open" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Data Management Section: Export & Delete Buttons -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="USER DATA CONTROLS"
+                android:textColor="?attr/themeAccent"
+                android:textSize="11sp"
+                android:letterSpacing="0.10"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium"
+                android:layout_marginBottom="10dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="20dp"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Download a copy of your chat histories, memories and preferences, or permanently wipe all app records from this device."
+                    android:textColor="?attr/themeTextMuted"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Export Data Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnExportMyData"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="EXPORT MY DATA (JSON)"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    app:backgroundTint="?attr/themeAccent"
+                    app:cornerRadius="14dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Delete All Data Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDeleteAllMyData"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="DELETE ALL MY DATA"
+                    android:textColor="@color/status_red"
+                    app:strokeColor="@color/status_red"
+                    app:strokeWidth="1.5dp"
+                    android:textStyle="bold"
+                    android:textSize="13sp"
+                    app:cornerRadius="14dp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

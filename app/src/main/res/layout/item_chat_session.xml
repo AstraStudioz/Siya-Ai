@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="@drawable/bg_jarvis_row_item"
+    android:paddingStart="14dp"
+    android:paddingEnd="10dp"
+    android:paddingVertical="12dp"
+    android:layout_marginBottom="8dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Chat Icon / Pin Indicator -->
+    <FrameLayout
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="12dp">
+
+        <ImageView
+            android:id="@+id/ivSessionIcon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_nav_chat"
+            app:tint="?attr/themeAccent"
+            android:contentDescription="Chat" />
+
+        <ImageView
+            android:id="@+id/ivPinBadge"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
+            android:layout_gravity="top|end"
+            android:src="@drawable/ic_sparkle"
+            app:tint="?attr/themeAccent"
+            android:visibility="gone"
+            android:contentDescription="Pinned" />
+    </FrameLayout>
+
+    <!-- Title and Timestamp -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvSessionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Conversation Title"
+            android:textColor="?attr/themeTextPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+        <TextView
+            android:id="@+id/tvSessionTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Today"
+            android:textColor="?attr/themeTextMuted"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <!-- 3-Dot More Options Button -->
+    <ImageButton
+        android:id="@+id/btnSessionOptions"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_menu"
+        app:tint="?attr/themeTextMuted"
+        android:scaleType="centerInside"
+        android:contentDescription="Options" />
+
+</LinearLayout>

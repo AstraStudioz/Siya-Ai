@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/themeBg"
+    android:orientation="vertical">
+
+    <!-- Top App Bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_back"
+            android:contentDescription="@string/desc_back"
+            app:tint="?attr/themeTextPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <TextView
+            android:id="@+id/tvHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Siya Camera"
+            android:textColor="?attr/themeTextPrimary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintStart_toEndOf="@id/btnBack"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginStart="8dp" />
+
+        <TextView
+            android:id="@+id/chipSessionStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:background="@drawable/bg_jarvis_chip"
+            android:gravity="center"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:text="Connecting..."
+            android:textColor="?attr/themeAccent"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Main Content Container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
+
+        <!-- Camera Card -->
+        <FrameLayout
+            android:id="@+id/cardCameraContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_jarvis_card"
+            android:clipToOutline="true"
+            android:layout_marginBottom="8dp">
+
+            <androidx.camera.view.PreviewView
+                android:id="@+id/previewView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <!-- Streaming Status Overlay ("Siya can see this") -->
+            <LinearLayout
+                android:id="@+id/layoutStreamingIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="28dp"
+                android:layout_gravity="top|start"
+                android:layout_margin="12dp"
+                android:background="@drawable/bg_jarvis_chip"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="10dp"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/circle_cyan"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/tvStreamingStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Siya can see this"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:fontFamily="sans-serif-medium" />
+            </LinearLayout>
+
+            <!-- Flip Camera Button -->
+            <ImageButton
+                android:id="@+id/btnFlipCamera"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="12dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="12dp"
+                android:background="@drawable/bg_jarvis_icon_square"
+                android:src="@drawable/ic_camera_flip"
+                app:tint="?attr/themeAccent"
+                android:contentDescription="Flip Camera" />
+
+            <!-- Paused / 10-min Timeout Overlay -->
+            <LinearLayout
+                android:id="@+id/layoutPausedOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#D00A0E17"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Camera Paused"
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Streaming was paused to save battery and data."
+                    android:textColor="?attr/themeTextMuted"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp" />
+
+                <Button
+                    android:id="@+id/btnResumeCamera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tap to resume"
+                    android:background="@drawable/bg_jarvis_pill_button"
+                    android:textColor="?attr/themeTextPrimary" />
+            </LinearLayout>
+
+            <!-- Permission Denied View -->
+            <LinearLayout
+                android:id="@+id/layoutPermissionDenied"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/themeCardBg"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Camera Permission Required"
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Siya needs camera access to see and explain what you point your phone at."
+                    android:textColor="?attr/themeTextMuted"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp" />
+
+                <Button
+                    android:id="@+id/btnOpenSettings"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Open Settings"
+                    android:background="@drawable/bg_jarvis_pill_button"
+                    android:textColor="?attr/themeTextPrimary" />
+            </LinearLayout>
+
+            <!-- Session Offline Overlay ("Siya is not running. Tap to start") -->
+            <LinearLayout
+                android:id="@+id/layoutSessionOffline"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#A0000000"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="20dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvSessionOfflineMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Connecting Siya..."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="12dp" />
+
+                <Button
+                    android:id="@+id/btnStartSession"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tap to start"
+                    android:background="@drawable/bg_jarvis_pill_button"
+                    android:textColor="?attr/themeTextPrimary" />
+            </LinearLayout>
+
+            <!-- Camera Startup / Bind Error Overlay -->
+            <LinearLayout
+                android:id="@+id/layoutCameraError"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/themeCardBg"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvCameraErrorTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Camera Could Not Start"
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/tvCameraErrorMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Camera preview could not be started or is in use by another application."
+                    android:textColor="?attr/themeTextMuted"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:layout_marginBottom="16dp" />
+
+                <Button
+                    android:id="@+id/btnRetryCamera"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Retry"
+                    android:background="@drawable/bg_jarvis_pill_button"
+                    android:textColor="?attr/themeTextPrimary" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Quick Chips (Horizontal Scroll) -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/chipDescribeDetail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:background="@drawable/bg_jarvis_chip"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/camera_chip_describe_label"
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/chipReadText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:background="@drawable/bg_jarvis_chip"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/camera_chip_read_label"
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/chipWhatIsThis"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:background="@drawable/bg_jarvis_chip"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/camera_chip_what_label"
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/chipExplainMore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:minHeight="48dp"
+                    android:background="@drawable/bg_jarvis_chip"
+                    android:gravity="center"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:text="@string/camera_chip_explain_label"
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:clickable="true"
+                    android:focusable="true" />
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- Answer Card (scrollable, max ~35% of the screen) -->
+        <LinearLayout
+            android:id="@+id/cardAnswer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_jarvis_card"
+            android:orientation="vertical"
+            android:padding="12dp"
+            android:layout_marginBottom="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="4dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="SIYA AI"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.08"
+                    android:fontFamily="sans-serif-medium" />
+
+                <ImageButton
+                    android:id="@+id/btnCopyAnswer"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_copy"
+                    app:tint="?attr/themeTextMuted"
+                    android:contentDescription="Copy Answer" />
+            </LinearLayout>
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxHeight="160dp">
+
+                <TextView
+                    android:id="@+id/tvAnswerText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Point camera at anything and speak or ask below..."
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="3dp"
+                    android:textIsSelectable="true"
+                    android:fontFamily="sans-serif" />
+            </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
+
+        <!-- Bottom Input Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <EditText
+                android:id="@+id/etQuestionInput"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_input_field"
+                android:hint="@string/camera_input_hint"
+                android:textColorHint="?attr/themeTextMuted"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="14sp"
+                android:fontFamily="sans-serif"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:singleLine="true"
+                android:imeOptions="actionSend"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/btnSendQuestion"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_jarvis_icon_square"
+                android:src="@drawable/ic_send_up"
+                app:tint="?attr/themeAccent"
+                android:contentDescription="Send Question"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/btnMicToggle"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_jarvis_icon_square"
+                android:src="@drawable/ic_mic_jarvis"
+                app:tint="?attr/themeAccent"
+                android:contentDescription="Toggle Mic" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

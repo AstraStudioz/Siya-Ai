@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand & Widget Headings -->
+    <string name="widget_brand_name">Siya AI</string>
+    <string name="widget_brand_subtitle">Your AI Companion ♡</string>
+    <string name="widget_greeting_hi">Hi, I\'m Siya ♡</string>
+    <string name="widget_help_prompt">How can I help you today?</string>
+    <string name="widget_tap_to_open">Tap to open</string>
+    <string name="widget_tap_to_talk">Tap to talk</string>
+    <string name="widget_always_with_you">Always with you ♡</string>
+    <string name="widget_system_tagline">Smart • Friendly • Always Here</string>
+
+    <!-- Action Labels -->
+    <string name="widget_action_voice">Voice</string>
+    <string name="widget_action_chat">Chat</string>
+    <string name="widget_action_tools">Tools</string>
+    <string name="widget_action_settings">Settings</string>
+
+    <!-- Weather & Assistant Placeholders -->
+    <string name="widget_weather_placeholder_temp">--°</string>
+    <string name="widget_weather_placeholder_cond">Open Siya AI to enable weather</string>
+    <string name="widget_weather_placeholder_city">Weather</string>
+    <string name="widget_greeting_subline">I\'m here whenever you need me. ♡</string>
+    <string name="widget_status_online">Online</string>
+    <string name="widget_status_off">Off</string>
+    <string name="widget_quote_author">— Siya AI ♡</string>
+
+    <!-- Accessibility Descriptions -->
+    <string name="widget_desc_open_app">Open Siya AI</string>
+    <string name="widget_desc_voice_action">Talk to Siya AI</string>
+    <string name="widget_desc_chat_action">Open chat with Siya AI</string>
+    <string name="widget_desc_tools_action">Open tools and hands-free control</string>
+    <string name="widget_desc_settings_action">Open Siya AI settings</string>
+    <string name="widget_desc_orb">Siya AI holographic core</string>
+    <string name="widget_desc_avatar">Siya avatar</string>
+    <string name="widget_desc_character">Siya character</string>
+    <string name="widget_desc_waveform">Audio waveform indicator</string>
+    <string name="widget_desc_weather">Current weather conditions</string>
+    <string name="widget_desc_status">Siya AI status</string>
+
+    <!-- Widget Info Descriptions -->
+    <string name="widget_quick_access_desc">Quick 2x2 access to Siya AI with glowing orb</string>
+    <string name="widget_quick_actions_desc">4x1 bar with Siya avatar and 4 action buttons</string>
+    <string name="widget_voice_desc">Compact 2x1 coral voice launcher</string>
+    <string name="widget_minimal_desc">Minimalist 2x2 companion widget</string>
+    <string name="widget_shortcuts_desc">2x2 grid of assistant shortcuts</string>
+    <string name="widget_home_desc">Full 4x2 assistant home hub with clock, weather, and character</string>
+    <string name="widget_weather_desc">4x2 dynamic weather &amp; greeting hub</string>
+    <string name="widget_quote_desc">4x1 daily inspiration from Siya</string>
+    <string name="widget_status_desc">4x1 assistant status and system info</string>
+</resources>

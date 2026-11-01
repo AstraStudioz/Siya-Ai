@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" style="background:transparent">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Siya AI avatar</title>
+<style>
+  html, body { height:100%; margin:0; background:transparent; overflow:hidden; }
+  body { display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; touch-action:manipulation; user-select:none; -webkit-user-select:none; font-family:system-ui,-apple-system,"Segoe UI",sans-serif; }
+  body.preview-bg { background:linear-gradient(135deg,#fff1ea,#ffd9c7 55%,#ffe9d6); }
+  #siya { width:100%; height:100%; max-width:100vmin; max-height:100vmin; display:block; }
+  :root { --gx:0; --gy:0; }
+
+  /* ---------- idle life ---------- */
+  .float { animation:float 3.6s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform:translateY(0) rotate(0deg); } 50% { transform:translateY(-4px) rotate(.5deg); } }
+  .shadow { transform-box:fill-box; transform-origin:center; animation:shadow 3.6s ease-in-out infinite; }
+  @keyframes shadow { 0%,100% { transform:scaleX(1); opacity:.9; } 50% { transform:scaleX(.88); opacity:.6; } }
+  .body { transform-box:fill-box; transform-origin:50% 100%; animation:breathe 3.6s ease-in-out infinite; }
+  @keyframes breathe { 0%,100% { transform:scaleY(1); } 50% { transform:scaleY(1.025); } }
+  .head { transform-origin:100px 150px; animation:headbob 5.2s ease-in-out infinite; }
+  @keyframes headbob { 0%,100% { transform:rotate(-1.3deg); } 50% { transform:rotate(1.5deg); } }
+  .hair-back { transform-origin:100px 30px; animation:sway 4.4s ease-in-out infinite; }
+  @keyframes sway { 0%,100% { transform:rotate(-1.2deg); } 50% { transform:rotate(1.2deg); } }
+  .lock-l { transform-origin:52px 112px; animation:lockL 3.9s ease-in-out infinite; }
+  .lock-r { transform-origin:148px 112px; animation:lockR 4.1s ease-in-out infinite; }
+  @keyframes lockL { 0%,100% { transform:rotate(1.5deg); } 50% { transform:rotate(-3.2deg); } }
+  @keyframes lockR { 0%,100% { transform:rotate(-1.5deg); } 50% { transform:rotate(3.2deg); } }
+  .ahoge { transform-origin:100px 32px; animation:ahoge 2.8s ease-in-out infinite; }
+  @keyframes ahoge { 0%,100% { transform:rotate(-7deg); } 50% { transform:rotate(9deg); } }
+  .eye { transform-box:fill-box; transform-origin:50% 50%; animation:blink 4.8s infinite; }
+  .eye.r { animation-delay:.02s; }
+  @keyframes blink { 0%,92%,100% { transform:scaleY(1); } 95.5% { transform:scaleY(.08); } }
+  .iris { transition:transform .35s ease; transform:translate(calc(var(--gx) * 1px), calc(var(--gy) * 1px)); }
+  .cup-glow { transform-box:fill-box; transform-origin:center; animation:glow 2.4s ease-in-out infinite; }
+  @keyframes glow { 0%,100% { opacity:.55; transform:scale(.9); } 50% { opacity:1; transform:scale(1.08); } }
+  .heart { transform-box:fill-box; transform-origin:center; opacity:0; animation:rise 3.4s ease-in infinite; }
+  .heart.h2 { animation-delay:1.1s; }
+  .heart.h3 { animation-delay:2.2s; }
+  @keyframes rise { 0% { opacity:0; transform:translateY(8px) scale(.5); } 20% { opacity:1; } 100% { opacity:0; transform:translateY(-22px) scale(1); } }
+  .spark { transform-box:fill-box; transform-origin:center; animation:twinkle 2.6s ease-in-out infinite; }
+  .spark.s2 { animation-delay:.8s; } .spark.s3 { animation-delay:1.6s; } .spark.s4 { animation-delay:2.1s; }
+  @keyframes twinkle { 0%,100% { opacity:.25; transform:scale(.5) rotate(0deg); } 50% { opacity:1; transform:scale(1.1) rotate(25deg); } }
+
+  /* ---------- parts shown per state ---------- */
+  .eye-happy, .m-open, .m-happy, .waves, .think, .burst { display:none; }
+
+  /* happy (tap / react) */
+  .happy .eye { display:none; }
+  .happy .eye-happy { display:block; }
+  .happy .m-smile { display:none; }
+  .happy .m-happy { display:block; }
+  .happy .blush { opacity:.95; }
+  .happy .burst { display:block; }
+  .happy .float { animation:bounce .55s ease-out 2; }
+  @keyframes bounce { 0%,100% { transform:translateY(0) scale(1,1); } 40% { transform:translateY(-9px) scale(.98,1.03); } 70% { transform:translateY(0) scale(1.03,.97); } }
+  .bheart { transform-box:fill-box; transform-origin:center; opacity:0; animation:burst 1.2s ease-out forwards; }
+  @keyframes burst { 0% { opacity:1; transform:translate(0,0) scale(.3); } 100% { opacity:0; transform:translate(var(--dx),var(--dy)) scale(1.1); } }
+  .blush { opacity:.55; transition:opacity .3s; }
+
+  /* speaking */
+  .state-speaking .m-smile { display:none; }
+  .state-speaking .m-open { display:block; transform-box:fill-box; transform-origin:50% 25%; animation:talk .26s ease-in-out infinite alternate; }
+  @keyframes talk { from { transform:scaleY(.3); } to { transform:scaleY(1.05); } }
+  .state-speaking .cup-glow { animation-duration:1.1s; }
+
+  /* listening */
+  .state-listening .head { animation:none; transform:rotate(4deg); transition:transform .4s ease; }
+  .state-listening .cup-glow { animation-duration:.8s; }
+  .state-listening .waves { display:block; }
+  .wv { fill:none; stroke:#ff8fbf; stroke-width:3; stroke-linecap:round; opacity:0; animation:wave 1.2s ease-out infinite; }
+  .wv.b { animation-delay:.35s; }
+  .wl { --wx:-4px; } .wr { --wx:4px; }
+  @keyframes wave { 0% { opacity:0; transform:translateX(0); } 30% { opacity:.95; } 100% { opacity:0; transform:translateX(var(--wx)); } }
+
+  /* thinking */
+  .state-thinking .think { display:block; }
+  .tdot { fill:#ff8fbf; animation:tdot 1.2s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+  .tdot.b { animation-delay:.2s; } .tdot.c { animation-delay:.4s; }
+  @keyframes tdot { 0%,60%,100% { transform:translateY(0); opacity:.45; } 30% { transform:translateY(-3px); opacity:1; } }
+
+  .paused * { animation-play-state:paused !important; }
+  @media (prefers-reduced-motion: reduce) {
+    .float, .shadow, .body, .head, .hair-back, .lock-l, .lock-r, .ahoge, .heart, .spark { animation:none !important; }
+    .heart { opacity:0; }
+  }
+
+  /* debug panel (only with ?debug) */
+  #dbg { position:fixed; left:0; right:0; bottom:6px; display:flex; flex-wrap:wrap; gap:4px; justify-content:center; }
+  #dbg button { font:600 11px system-ui; padding:5px 9px; border-radius:12px; border:1px solid #e9b7c9; background:#fff; color:#7a3b57; }
+</style>
+</head>
+<body>
+<svg id="siya" class="state-idle" viewBox="0 0 200 200" role="img" aria-label="Siya AI animated avatar">
+  <defs>
+    <linearGradient id="hairGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4d2d44"/><stop offset="1" stop-color="#27161f"/></linearGradient>
+    <linearGradient id="skinGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffeadf"/><stop offset="1" stop-color="#ffd6c4"/></linearGradient>
+    <linearGradient id="irisGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5d2870"/><stop offset=".55" stop-color="#b24a90"/><stop offset="1" stop-color="#ff9fc6"/></linearGradient>
+    <linearGradient id="hoodGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff5f8"/><stop offset="1" stop-color="#f2d6e5"/></linearGradient>
+    <linearGradient id="cupGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dcc2ff"/><stop offset="1" stop-color="#a483e6"/></linearGradient>
+    <radialGradient id="glowGrad"><stop offset="0" stop-color="#fff0f7"/><stop offset=".5" stop-color="#ffb3d3"/><stop offset="1" stop-color="#ff8fbf"/></radialGradient>
+    <clipPath id="eyeClip"><ellipse rx="14" ry="16"/></clipPath>
+    <path id="hrt" d="M0,4 C-8,-2 -6,-9 -2.5,-9 C-1,-9 0,-8 0,-7 C0,-8 1,-9 2.5,-9 C6,-9 8,-2 0,4 Z"/>
+    <path id="spk" d="M0,-6 L1.6,-1.6 L6,0 L1.6,1.6 L0,6 L-1.6,1.6 L-6,0 L-1.6,-1.6 Z"/>
+  </defs>
+
+  <ellipse class="shadow" cx="100" cy="195" rx="46" ry="5" fill="#b9707f" opacity=".25"/>
+
+  <g class="float">
+
+    <!-- back hair -->
+    <g class="hair-back">
+      <path d="M34,100 C30,50 62,22 100,22 C138,22 170,50 166,100 C168,130 172,156 162,178 C150,174 146,162 144,142 L56,142 C54,162 50,174 38,178 C28,156 32,130 34,100 Z" fill="url(#hairGrad)"/>
+      <path d="M44,70 C40,100 42,130 46,160" fill="none" stroke="#8b5a7d" stroke-width="3" stroke-linecap="round" opacity=".28"/>
+      <path d="M156,70 C160,100 158,130 154,160" fill="none" stroke="#8b5a7d" stroke-width="3" stroke-linecap="round" opacity=".28"/>
+    </g>
+
+    <!-- hoodie / body -->
+    <g class="body">
+      <path d="M70,158 C80,148 120,148 130,158 C134,172 120,180 100,180 C80,180 66,172 70,158 Z" fill="#efd0df"/>
+      <path d="M44,200 C46,170 72,156 100,156 C128,156 154,170 156,200 Z" fill="url(#hoodGrad)"/>
+      <path d="M80,160 C88,172 112,172 120,160" fill="none" stroke="#e3bfd2" stroke-width="2.2" stroke-linecap="round"/>
+      <path d="M91,172 L88,193" stroke="#ff8a5c" stroke-width="2.4" stroke-linecap="round"/>
+      <path d="M109,172 L112,193" stroke="#ff8a5c" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="88" cy="194" r="2.6" fill="#ff8a5c"/><circle cx="112" cy="194" r="2.6" fill="#ff8a5c"/>
+    </g>
+
+    <!-- neck -->
+    <path d="M90,142 L110,142 L110,160 C106,166 94,166 90,160 Z" fill="#ffd0bc"/>
+
+    <!-- head -->
+    <g class="head">
+      <path d="M46,96 C46,62 70,42 100,42 C130,42 154,62 154,96 C154,126 134,152 100,153 C66,152 46,126 46,96 Z" fill="url(#skinGrad)" stroke="#f3bba8" stroke-width="1" stroke-opacity=".6"/>
+
+      <ellipse class="blush" cx="62" cy="130" rx="10.5" ry="5.8" fill="#ff9aa6"/>
+      <ellipse class="blush" cx="138" cy="130" rx="10.5" ry="5.8" fill="#ff9aa6"/>
+      <path d="M99,125 Q100,127.2 101,125" fill="none" stroke="#e8a89a" stroke-width="1.6" stroke-linecap="round"/>
+
+      <!-- mouth -->
+      <path class="m-smile" d="M92,135 Q100,142 108,135" fill="none" stroke="#d4586a" stroke-width="2.6" stroke-linecap="round"/>
+      <g class="m-open"><ellipse cx="100" cy="137" rx="6" ry="5.6" fill="#8f2c45"/><ellipse cx="100" cy="140" rx="3.6" ry="2.2" fill="#ff8fa3"/></g>
+      <g class="m-happy"><path d="M89,132 Q100,152 111,132 Z" fill="#8f2c45" stroke="#8f2c45" stroke-width="2" stroke-linejoin="round"/><path d="M94,141 Q100,147 106,141 Q100,138 94,141Z" fill="#ff8fa3"/></g>
+
+      <!-- eyes -->
+      <g transform="translate(74 112)">
+        <g class="eye l">
+          <ellipse rx="14.5" ry="16.5" fill="#fffafc"/>
+          <g clip-path="url(#eyeClip)">
+            <g class="iris">
+              <ellipse rx="11.8" ry="15" fill="url(#irisGrad)"/>
+              <ellipse cx="0" cy="1.5" rx="5.6" ry="8.2" fill="#2b1030"/>
+              <path d="M-7,8 Q0,14 7,8 Q0,11.5 -7,8Z" fill="#ffd0e6" opacity=".7"/>
+              <circle cx="-4.2" cy="-6" r="3.8" fill="#fff"/>
+              <circle cx="4.6" cy="5" r="1.9" fill="#fff" opacity=".92"/>
+            </g>
+          </g>
+          <path d="M-15.5,-3 C-13,-18.5 13,-18.5 15.5,-3" fill="none" stroke="#2a1824" stroke-width="3.8" stroke-linecap="round"/>
+          <path d="M-15.5,-3 L-19.5,-7" fill="none" stroke="#2a1824" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M-9,15.5 Q0,19 9,15.5" fill="none" stroke="#e9aaa0" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>
+        </g>
+        <path class="eye-happy" d="M-13,4 Q0,-13 13,4" fill="none" stroke="#2a1824" stroke-width="3.8" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(126 112)">
+        <g class="eye r">
+          <ellipse rx="14.5" ry="16.5" fill="#fffafc"/>
+          <g clip-path="url(#eyeClip)">
+            <g class="iris">
+              <ellipse rx="11.8" ry="15" fill="url(#irisGrad)"/>
+              <ellipse cx="0" cy="1.5" rx="5.6" ry="8.2" fill="#2b1030"/>
+              <path d="M-7,8 Q0,14 7,8 Q0,11.5 -7,8Z" fill="#ffd0e6" opacity=".7"/>
+              <circle cx="-4.2" cy="-6" r="3.8" fill="#fff"/>
+              <circle cx="4.6" cy="5" r="1.9" fill="#fff" opacity=".92"/>
+            </g>
+          </g>
+          <path d="M-15.5,-3 C-13,-18.5 13,-18.5 15.5,-3" fill="none" stroke="#2a1824" stroke-width="3.8" stroke-linecap="round"/>
+          <path d="M15.5,-3 L19.5,-7" fill="none" stroke="#2a1824" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M-9,15.5 Q0,19 9,15.5" fill="none" stroke="#e9aaa0" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>
+        </g>
+        <path class="eye-happy" d="M-13,4 Q0,-13 13,4" fill="none" stroke="#2a1824" stroke-width="3.8" stroke-linecap="round"/>
+      </g>
+
+      <!-- side hair locks -->
+      <g class="lock-l"><path d="M50,100 C40,126 42,156 48,180 C58,178 64,167 62,150 C60,134 58,118 58,104 Z" fill="url(#hairGrad)"/><path d="M52,118 C48,138 50,156 52,170" fill="none" stroke="#8b5a7d" stroke-width="2.2" stroke-linecap="round" opacity=".4"/></g>
+      <g class="lock-r"><path d="M150,100 C160,126 158,156 152,180 C142,178 136,167 138,150 C140,134 142,118 142,104 Z" fill="url(#hairGrad)"/><path d="M148,118 C152,138 150,156 148,170" fill="none" stroke="#8b5a7d" stroke-width="2.2" stroke-linecap="round" opacity=".4"/></g>
+
+      <!-- bangs -->
+      <path d="M46,98 C40,58 68,30 100,30 C132,30 160,58 154,98 C151,90 148,82 142,74 C141,80 137,85 130,87 C126,80 122,75 118,71 C115,78 109,85 102,89 C98,81 94,76 88,72 C85,80 79,85 72,87 C68,80 62,75 56,71 C52,79 50,89 46,98 Z" fill="url(#hairGrad)"/>
+      <path d="M62,50 C74,40 92,36 108,38" fill="none" stroke="#9a6489" stroke-width="5" stroke-linecap="round" opacity=".5"/>
+      <path d="M118,40 C128,42 137,47 143,54" fill="none" stroke="#9a6489" stroke-width="3" stroke-linecap="round" opacity=".4"/>
+      <path class="ahoge" d="M100,32 C95,16 108,8 113,17" fill="none" stroke="#3a2230" stroke-width="3.2" stroke-linecap="round"/>
+
+      <!-- headphones -->
+      <path d="M40,106 C36,36 70,17 100,17 C130,17 164,36 160,106" fill="none" stroke="#bfa0f2" stroke-width="7" stroke-linecap="round"/>
+      <path d="M46,70 C52,44 76,26 100,24" fill="none" stroke="#ede0ff" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+      <g transform="translate(40 108)">
+        <ellipse rx="13.5" ry="18" fill="url(#cupGrad)" stroke="#9a78dc" stroke-width="2"/>
+        <ellipse class="cup-glow" rx="7.5" ry="11.5" fill="url(#glowGrad)"/>
+        <path d="M-7,-12 Q-10,-2 -7,6" stroke="#fff" stroke-opacity=".65" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </g>
+      <g transform="translate(160 108)">
+        <ellipse rx="13.5" ry="18" fill="url(#cupGrad)" stroke="#9a78dc" stroke-width="2"/>
+        <ellipse class="cup-glow" rx="7.5" ry="11.5" fill="url(#glowGrad)"/>
+        <path d="M7,-12 Q10,-2 7,6" stroke="#fff" stroke-opacity=".65" stroke-width="2" fill="none" stroke-linecap="round"/>
+      </g>
+    </g>
+
+    <!-- listening waves -->
+    <g class="waves">
+      <path class="wv wl a" d="M24,90 Q18,108 24,126"/><path class="wv wl b" d="M14,86 Q6,108 14,130"/>
+      <path class="wv wr a" d="M176,90 Q182,108 176,126"/><path class="wv wr b" d="M186,86 Q194,108 186,130"/>
+    </g>
+
+    <!-- thinking bubble -->
+    <g class="think">
+      <ellipse cx="156" cy="26" rx="25" ry="13" fill="#fff" stroke="#f3b6cf" stroke-width="2"/>
+      <circle cx="132" cy="44" r="3.2" fill="#fff" stroke="#f3b6cf" stroke-width="1.6"/>
+      <circle cx="141" cy="37" r="2" fill="#fff" stroke="#f3b6cf" stroke-width="1.4"/>
+      <circle class="tdot a" cx="146" cy="26" r="3.4"/><circle class="tdot b" cx="156" cy="26" r="3.4"/><circle class="tdot c" cx="166" cy="26" r="3.4"/>
+    </g>
+
+    <!-- ambient hearts + sparkles -->
+    <g transform="translate(172 52)"><use class="heart h1" href="#hrt" fill="#ff8aa8"/></g>
+    <g transform="translate(164 70)"><use class="heart h2" href="#hrt" fill="#ffa3ba" transform="scale(.8)"/></g>
+    <g transform="translate(176 40)"><use class="heart h3" href="#hrt" fill="#ff7fa5" transform="scale(.7)"/></g>
+    <g transform="translate(26 44)"><use class="spark s1" href="#spk" fill="#ffb26b"/></g>
+    <g transform="translate(176 96) scale(.8)"><use class="spark s2" href="#spk" fill="#ff9ec1"/></g>
+    <g transform="translate(30 150) scale(.7)"><use class="spark s3" href="#spk" fill="#ffc48a"/></g>
+    <g transform="translate(150 14) scale(.7)"><use class="spark s4" href="#spk" fill="#ffb26b"/></g>
+
+    <!-- tap / react heart burst -->
+    <g class="burst">
+      <g transform="translate(100 44)"><use class="bheart" href="#hrt" fill="#ff7fa5" style="--dx:-34px;--dy:-30px;animation-delay:0.00s"/></g>
+      <g transform="translate(100 44)"><use class="bheart" href="#hrt" fill="#ff7fa5" style="--dx:-14px;--dy:-44px;animation-delay:0.06s"/></g>
+      <g transform="translate(100 44)"><use class="bheart" href="#hrt" fill="#ff7fa5" style="--dx:8px;--dy:-48px;animation-delay:0.12s"/></g>
+      <g transform="translate(100 44)"><use class="bheart" href="#hrt" fill="#ff7fa5" style="--dx:30px;--dy:-40px;animation-delay:0.18s"/></g>
+      <g transform="translate(100 44)"><use class="bheart" href="#hrt" fill="#ff7fa5" style="--dx:44px;--dy:-22px;animation-delay:0.24s"/></g>
+      </g>
+  </g>
+</svg>
+
+<script>
+(function () {
+  var root = document.getElementById("siya");
+  var STATES = ["idle", "listening", "thinking", "speaking"];
+  var state = "idle", happyTimer = null;
+  var q = new URLSearchParams(location.search);
+
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  function look(x, y) {
+    root.style.setProperty("--gx", x);
+    root.style.setProperty("--gy", y);
+  }
+
+  // state: idle | listening | thinking | speaking
+  function setState(s) {
+    if (STATES.indexOf(s) < 0) s = "idle";
+    STATES.forEach(function (n) { root.classList.remove("state-" + n); });
+    root.classList.add("state-" + s);
+    state = s;
+    root.classList.remove("happy");
+    if (s === "thinking") look(3.5, -3.5); else if (s !== "idle") look(0, 0);
+  }
+
+  // short happy reaction (hearts + ^_^ eyes)
+  function react() {
+    root.classList.remove("happy");
+    void root.getBoundingClientRect();
+    root.classList.add("happy");
+    clearTimeout(happyTimer);
+    happyTimer = setTimeout(function () { root.classList.remove("happy"); }, 1500);
+  }
+
+  window.setState = setState;
+  window.SiyaAvatar = { setState: setState, react: react, getState: function () { return state; } };
+
+  // eyes wander a little while idle
+  (function glance() {
+    if (state === "idle") look(rnd(-3.5, 3.5), rnd(-2, 2.5));
+    setTimeout(glance, rnd(1800, 4200));
+  })();
+
+  // occasional cute reaction when idle (first one after ~10s, then every 14-24s)
+  function charm() {
+    if (state === "idle" && !document.hidden) react();
+    setTimeout(charm, rnd(14000, 24000));
+  }
+  setTimeout(charm, rnd(8000, 14000));
+
+  // tap in a normal browser
+  window.addEventListener("pointerdown", function (e) { if (e.isTrusted && !e.target.closest("#dbg")) react(); });
+
+  // save battery when the page is hidden
+  document.addEventListener("visibilitychange", function () {
+    document.body.classList.toggle("paused", document.hidden);
+  });
+
+  // test helpers: ?bg  ?state=speaking  ?debug
+  if (q.has("bg")) document.body.classList.add("preview-bg");
+  if (q.get("state")) setState(q.get("state"));
+  if (q.has("debug")) {
+    var d = document.createElement("div");
+    d.id = "dbg";
+    STATES.concat(["happy"]).forEach(function (n) {
+      var b = document.createElement("button");
+      b.textContent = n;
+      b.onclick = function () { n === "happy" ? react() : setState(n); };
+      d.appendChild(b);
+    });
+    document.body.appendChild(d);
+  }
+})();
+</script>
+</body>
+</html>

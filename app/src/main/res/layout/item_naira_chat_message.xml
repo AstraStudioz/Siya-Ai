@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="6dp"
+    android:paddingBottom="6dp">
+
+    <!-- User Message Bubble (Right Aligned) -->
+    <LinearLayout
+        android:id="@+id/layoutUserContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="end"
+        android:visibility="gone">
+
+        <!-- User Attachments Container -->
+        <LinearLayout
+            android:id="@+id/layoutUserAttachments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end|center_vertical"
+            android:layout_marginBottom="4dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvUserMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="280dp"
+            android:background="@drawable/bg_jarvis_chat_user"
+            android:paddingStart="16dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="10dp"
+            android:text="Hi"
+            android:textColor="#FFFFFF"
+            android:fontFamily="sans-serif"
+            android:textSize="15sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="2dp"
+            android:layout_marginEnd="0dp">
+
+            <ImageView
+                android:id="@+id/btnUserEdit"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="14dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_edit"
+                app:tint="?attr/themeTextMuted"
+                android:contentDescription="Edit message" />
+
+            <ImageView
+                android:id="@+id/btnUserCopy"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="14dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_copy"
+                app:tint="?attr/themeTextMuted"
+                android:contentDescription="Copy message" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Assistant Message Bubble (Left Aligned) -->
+    <LinearLayout
+        android:id="@+id/layoutAssistantContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="start"
+        android:layout_marginTop="6dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tvAssistantMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="300dp"
+            android:background="@drawable/bg_jarvis_chat_assistant"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="12dp"
+            android:text="Hey! I'm doing great, aap. How are you feeling today? 😊"
+            android:textColor="?attr/themeTextPrimary"
+            android:fontFamily="sans-serif"
+            android:textSize="15sp"
+            android:lineSpacingExtra="3dp" />
+
+        <!-- Vertical Container for Code Cards and Other Extras -->
+        <LinearLayout
+            android:id="@+id/layoutAssistantExtras"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxWidth="320dp"
+            android:orientation="vertical"
+            android:layout_marginTop="4dp" />
+
+        <!-- Action Chips: Retry / Continue -->
+        <LinearLayout
+            android:id="@+id/layoutAssistantActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="6dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/chipRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_jarvis_chip"
+                android:text="@string/chat_chip_retry"
+                android:textColor="?attr/themeAccent"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/chipContinue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_jarvis_chip"
+                android:text="@string/chat_chip_continue"
+                android:textColor="?attr/themeAccent"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="4dp"
+                android:layout_marginStart="8dp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="2dp"
+            android:layout_marginStart="0dp">
+
+            <ImageView
+                android:id="@+id/btnAssistantCopy"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:padding="14dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_copy"
+                app:tint="?attr/themeTextMuted"
+                android:contentDescription="Copy assistant response" />
+
+            <LinearLayout
+                android:id="@+id/btnDownloadZip"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_jarvis_chip"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="10dp"
+                android:layout_marginStart="4dp"
+                android:visibility="gone">
+
+                <ImageView
+                    android:id="@+id/ivDownloadZipIcon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_download"
+                    app:tint="?attr/themeAccent"
+                    android:contentDescription="@string/chat_btn_download_zip" />
+
+                <TextView
+                    android:id="@+id/tvDownloadZipText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/chat_btn_download_zip"
+                    android:textColor="?attr/themeAccent"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Inline Status Row for Saved ZIP -->
+        <LinearLayout
+            android:id="@+id/layoutZipSavedInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="4dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tvZipSavedPath"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="?attr/themeTextMuted"
+                android:text="Saved to Downloads/Siya Ai/code.zip" />
+
+            <TextView
+                android:id="@+id/btnZipOpen"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="2dp"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="?attr/themeAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="@string/chat_action_open" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="?attr/themeTextMuted"
+                android:text="•" />
+
+            <TextView
+                android:id="@+id/btnZipShare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:paddingHorizontal="4dp"
+                android:paddingVertical="2dp"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="?attr/themeAccent"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="@string/chat_action_share" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

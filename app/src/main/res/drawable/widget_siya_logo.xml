@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="36dp"
+    android:height="36dp"
+    android:viewportWidth="36"
+    android:viewportHeight="36">
+    <!-- Flame / lotus petal logo of Siya AI -->
+    <path
+        android:fillColor="#FF7A59"
+        android:pathData="M18,3C14,10 9,15 9,21C9,27 13.5,31 18,31C22.5,31 27,27 27,21C27,15 22,10 18,3Z" />
+    <path
+        android:fillColor="#FFAE73"
+        android:pathData="M18,12C16,16 13,19 13,23C13,26 15.5,28 18,28C20.5,28 23,26 23,23C23,19 20,16 18,12Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M18,18C17.5,19.5 16.5,21 16.5,22.5C16.5,24 17.2,25 18,25C18.8,25 19.5,24 19.5,22.5C19.5,21 18.5,19.5 18,18Z" />
+</vector>

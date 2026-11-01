@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="96"
+    android:viewportHeight="96">
+    <!-- Glowing glass orb background -->
+    <path
+        android:fillColor="#33FF8E6B"
+        android:pathData="M48,4A44,44 0 1,0 92,48A44,44 0 0,0 48,4Z" />
+    <path
+        android:fillColor="#4DFFF0E6"
+        android:pathData="M48,12A36,36 0 1,0 84,48A36,36 0 0,0 48,12Z" />
+    <path
+        android:strokeColor="#99FFFFFF"
+        android:strokeWidth="1.5"
+        android:fillColor="#00000000"
+        android:pathData="M48,12A36,36 0 1,0 84,48A36,36 0 0,0 48,12Z" />
+    <!-- Flame / logo inside the orb -->
+    <path
+        android:fillColor="#FF7A59"
+        android:pathData="M48,26C42,35 36,42 36,50C36,58 41.5,63 48,63C54.5,63 60,58 60,50C60,42 54,35 48,26Z" />
+    <path
+        android:fillColor="#FFAE73"
+        android:pathData="M48,37C45,43 41,47 41,52C41,56 44.5,59 48,59C51.5,59 55,56 55,52C55,47 51,43 48,37Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M48,44C47,46 45.5,48 45.5,51C45.5,53 46.5,54.5 48,54.5C49.5,54.5 50.5,53 50.5,51C50.5,48 49,46 48,44Z" />
+</vector>

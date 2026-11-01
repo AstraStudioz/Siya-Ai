@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Widget Glass Background & Gradients -->
+    <color name="widget_glass_bg_start">#FFF8F3</color>
+    <color name="widget_glass_bg_center">#FFF0E6</color>
+    <color name="widget_glass_bg_end">#FFDFCE</color>
+    <color name="widget_glass_stroke">#B3FFFFFF</color>
+    <color name="widget_glass_card_inner">#40FFFFFF</color>
+
+    <!-- Typography (Dark Plum & Mauve) -->
+    <color name="widget_text_primary">#2D1927</color>
+    <color name="widget_text_secondary">#7A5C6D</color>
+    <color name="widget_text_tertiary">#A18897</color>
+
+    <!-- Button Tiles -->
+    <color name="widget_btn_tile_bg">#FFFDFB</color>
+    <color name="widget_btn_tile_stroke">#B3FFFFFF</color>
+
+    <!-- Action Icons -->
+    <color name="widget_icon_voice">#FF6B57</color>
+    <color name="widget_icon_chat">#93457D</color>
+    <color name="widget_icon_tools">#93457D</color>
+    <color name="widget_icon_settings">#93457D</color>
+
+    <!-- Coral Mic Button for Voice Widget -->
+    <color name="widget_mic_coral_start">#FF8E6B</color>
+    <color name="widget_mic_coral_end">#FF5951</color>
+    <color name="widget_mic_ring_outer">#33FF8E6B</color>
+    <color name="widget_mic_ring_inner">#80FFA88E</color>
+
+    <!-- Status Indicator -->
+    <color name="widget_status_online">#27AE60</color>
+    <color name="widget_status_off">#9E9E9E</color>
+</resources>

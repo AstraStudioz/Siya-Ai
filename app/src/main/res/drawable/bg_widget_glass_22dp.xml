@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="22dp" />
+            <gradient
+                android:angle="315"
+                android:startColor="@color/widget_glass_bg_start"
+                android:centerColor="@color/widget_glass_bg_center"
+                android:endColor="@color/widget_glass_bg_end"
+                android:type="linear" />
+            <stroke
+                android:width="1.2dp"
+                android:color="@color/widget_glass_stroke" />
+        </shape>
+    </item>
+</layer-list>

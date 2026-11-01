@@ -1,0 +1,6 @@
+{
+  "name": "Siya Ai",
+  "description": "Siya AI — Your smart companion voice assistant with real-time multimodal AI and device automation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

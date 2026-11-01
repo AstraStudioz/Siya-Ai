@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="overlay_edges">
+        <item>Right</item>
+        <item>Left</item>
+        <item>Top</item>
+        <item>Bottom</item>
+    </string-array>
+    <string name="app_name">Siya Ai</string>
+    <string name="jarvis_title">SIYA AI</string>
+
+    <string name="state_idle">IDLE</string>
+    <string name="state_listening">LISTENING</string>
+    <string name="state_thinking">THINKING</string>
+    <string name="state_speaking">SPEAKING</string>
+
+    <string name="btn_on">ON</string>
+    <string name="btn_off">OFF</string>
+    <string name="status_ready">READY</string>
+    <string name="status_live">LIVE</string>
+    <string name="status_connecting">CONNECTING&#8230;</string>
+    <string name="status_disconnected">OFFLINE</string>
+
+    <string name="settings_title">SETTINGS</string>
+    <string name="api_key_label">Gemini API Key</string>
+    <string name="api_key_hint">Paste your Gemini API key</string>
+    <string name="model_label">AI Model</string>
+    <string name="voice_label">Voice</string>
+    <string name="personality_label">Personality</string>
+    <string name="username_label">User Name</string>
+    <string name="username_hint">e.g. Tony Stark, Sir, Boss (optional)</string>
+
+    <string name="chat_history_title">Conversation History</string>
+    <string name="no_history">No conversation turns yet.</string>
+    <string name="clear_history">Clear History</string>
+
+    <string name="assistant_mode">Assistant Mode</string>
+    <string name="history_label">History</string>
+    <string name="desc_mute_mic">Mute or Unmute Mic</string>
+    <string name="desc_back">Back</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_paste">Paste from clipboard</string>
+    <string name="chat_label_you">YOU</string>
+    <string name="chat_label_jarvis">SIYA AI</string>
+
+    <string name="accessibility_service_desc">Provides automation for sending WhatsApp messages and executing approved hands-free actions for SIYA AI.</string>
+    <string name="memory_title">MEMORY CORE</string>
+    <string name="memory_subtitle">Long-Term &amp; Contextual Knowledge</string>
+    <string name="search_memories">Search memories&#8230;</string>
+    <string name="add_memory">Add Memory</string>
+    <string name="no_memories">No memories recorded yet.</string>
+    <string name="category_all">All</string>
+    <string name="category_personal">Personal</string>
+    <string name="category_preferences">Preferences</string>
+    <string name="category_contacts">Contacts</string>
+    <string name="category_routines">Routines</string>
+    <string name="category_notes">Notes</string>
+
+    <string name="camera_chip_describe_label">Describe in detail</string>
+    <string name="camera_chip_describe_prompt">Camera me jo dikh raha hai use detail me samjhao: ye kya hai, important details, uses aur interesting facts.</string>
+    <string name="camera_chip_read_label">Read text</string>
+    <string name="camera_chip_read_prompt">Camera me jo text likha hai wo padho aur uska matlab batao.</string>
+    <string name="camera_chip_what_label">What is this?</string>
+    <string name="camera_chip_what_prompt">Ye kya hai?</string>
+    <string name="camera_chip_explain_label">Explain more</string>
+    <string name="camera_chip_explain_prompt">Isko aur detail me samjhao.</string>
+    <string name="camera_input_hint">Ask about what you see&#8230;</string>
+
+    <string name="error_gemini_overloaded">Gemini abhi busy hai (high demand). Thodi der baad dobara try kijiye.</string>
+    <string name="error_gemini_timeout">Jawab aane me der lag rahi hai. Dobara try kijiye.</string>
+    <string name="error_gemini_rate_limited">Request limit poori ho gayi hai. Thodi der baad try kijiye.</string>
+    <string name="error_gemini_auth">API key ya billing check kijiye (API Connection screen).</string>
+    <string name="error_gemini_transient">Internet ya server me problem aayi. Dobara try kijiye.</string>
+    <string name="error_gemini_bad_request">Ye request process nahi ho paayi. Alag tareeke se likh kar dekhiye.</string>
+    <string name="chat_chip_retry">Retry</string>
+    <string name="chat_chip_continue">Continue</string>
+    <string name="chat_btn_download_zip">Download ZIP</string>
+    <string name="chat_btn_download_generating">Generating&#8230;</string>
+    <string name="chat_btn_download_saving">Saving&#8230;</string>
+    <string name="chat_action_open">Open</string>
+    <string name="chat_action_share">Share</string>
+</resources>
+

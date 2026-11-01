@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Placeholder Siya character illustration silhouette in soft plum & coral -->
+    <path
+        android:fillColor="#33FF8E6B"
+        android:pathData="M60,10A50,50 0 1,0 110,60A50,50 0 0,0 60,10Z" />
+    <path
+        android:fillColor="#7A5C6D"
+        android:pathData="M60,25A20,20 0 1,0 80,45A20,20 0 0,0 60,25Z" />
+    <path
+        android:fillColor="#FF725E"
+        android:pathData="M35,110C35,78 50,70 60,70C70,70 85,78 85,110Z" />
+    <path
+        android:fillColor="#FFA266"
+        android:pathData="M52,38A8,8 0 0,1 68,38A8,8 0 0,1 52,38Z" />
+</vector>

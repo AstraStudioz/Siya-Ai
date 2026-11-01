@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_jarvis_card"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="12dp"
+    android:paddingBottom="24dp">
+
+    <!-- Drag Handle -->
+    <View
+        android:layout_width="36dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/bg_jarvis_chip" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Model &amp; Mode"
+        android:textColor="?attr/themeTextPrimary"
+        android:textSize="18sp"
+        android:fontFamily="sans-serif-medium"
+        android:textStyle="bold"
+        android:layout_marginBottom="4dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Choose conversation style or specialized AI generator"
+        android:textColor="?attr/themeTextMuted"
+        android:textSize="13sp"
+        android:layout_marginBottom="16dp" />
+
+    <!-- Option 1: Siya Chat -->
+    <LinearLayout
+        android:id="@+id/optModelSiya"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="8dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_nav_chat"
+            app:tint="?attr/themeAccent"
+            android:layout_marginEnd="14dp"
+            android:contentDescription="Chat" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Siya (Chat)"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Smart conversational assistant with Gemini Live"
+                android:textColor="?attr/themeTextMuted"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/checkSiya"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_check_small"
+            app:tint="?attr/themeAccent"
+            android:visibility="gone"
+            android:contentDescription="Selected" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/themeCardBorder"
+        android:layout_marginVertical="4dp" />
+
+    <!-- Option 2: Image Generator -->
+    <LinearLayout
+        android:id="@+id/optModelImage"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="8dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_attach_gallery"
+            app:tint="?attr/themeAccent"
+            android:layout_marginEnd="14dp"
+            android:contentDescription="Image" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Image Generator"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Imagen 3 / Gemini 2.5 visual art creator"
+                android:textColor="?attr/themeTextMuted"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/checkImage"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_check_small"
+            app:tint="?attr/themeAccent"
+            android:visibility="gone"
+            android:contentDescription="Selected" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/themeCardBorder"
+        android:layout_marginVertical="4dp" />
+
+    <!-- Option 3: Code Mode -->
+    <LinearLayout
+        android:id="@+id/optModelCode"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="8dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_code_chip"
+            app:tint="?attr/themeAccent"
+            android:layout_marginEnd="14dp"
+            android:contentDescription="Code" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Code Mode"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Precise syntax, algorithms &amp; debugging"
+                android:textColor="?attr/themeTextMuted"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/checkCode"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_check_small"
+            app:tint="?attr/themeAccent"
+            android:visibility="gone"
+            android:contentDescription="Selected" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?attr/themeCardBorder"
+        android:layout_marginVertical="4dp" />
+
+    <!-- Option 4: Gemini 2.5 Flash -->
+    <LinearLayout
+        android:id="@+id/optModelGemini25"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="?attr/selectableItemBackground"
+        android:paddingHorizontal="8dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_sparkle"
+            app:tint="?attr/themeAccent"
+            android:layout_marginEnd="14dp"
+            android:contentDescription="Gemini 2.5" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gemini 2.5 Flash"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ultra-fast balanced reasoning &amp; low latency"
+                android:textColor="?attr/themeTextMuted"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/checkGemini25"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_check_small"
+            app:tint="?attr/themeAccent"
+            android:visibility="gone"
+            android:contentDescription="Selected" />
+    </LinearLayout>
+
+</LinearLayout>

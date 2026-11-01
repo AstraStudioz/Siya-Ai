@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rootTermuxLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/themeBg"
+    android:orientation="vertical">
+
+    <!-- Top App Bar -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_jarvis_icon_square"
+            android:src="@drawable/ic_back"
+            android:contentDescription="Back"
+            app:tint="?attr/themeTextPrimary"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            app:layout_constraintStart_toEndOf="@id/btnBack"
+            app:layout_constraintEnd_toStartOf="@id/layoutTopActions"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/tvTerminalTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Siya Shell • Terminal"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="16sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/tvTerminalStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sandboxed Shell • Guard Active"
+                android:textColor="?attr/themeTextMuted"
+                android:textSize="11sp"
+                android:fontFamily="sans-serif" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutTopActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/btnTermuxBridge"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_jarvis_chip"
+                android:gravity="center"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:text="Termux"
+                android:textColor="?attr/themeAccent"
+                android:textSize="12sp"
+                android:fontFamily="sans-serif-medium"
+                android:textStyle="bold"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/btnClearTerminal"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_jarvis_icon_square"
+                android:src="@drawable/ic_delete"
+                app:tint="?attr/themeTextMuted"
+                android:contentDescription="Clear Output" />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Info / Engine Status Card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_jarvis_card"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/ivGuardStatus"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_verified_badge"
+            app:tint="?attr/themeAccent"
+            android:contentDescription="Status" />
+
+        <TextView
+            android:id="@+id/tvGuardSummary"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="CommandGuard: Destructive root/system writes blocked."
+            android:textColor="?attr/themeTextMuted"
+            android:textSize="11sp"
+            android:fontFamily="sans-serif" />
+
+        <TextView
+            android:id="@+id/tvShellModeTag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LOCAL SH"
+            android:textColor="?attr/themeAccent"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium" />
+    </LinearLayout>
+
+    <!-- Terminal Console Screen -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/bg_jarvis_card"
+        android:padding="12dp">
+
+        <ScrollView
+            android:id="@+id/scrollTerminal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <TextView
+                android:id="@+id/tvTerminalOutput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="12sp"
+                android:lineSpacingExtra="3dp"
+                android:textIsSelectable="true"
+                android:text="Siya AI Terminal [Local Sandboxed Shell]\nType a command or tap quick actions below.\n$\n" />
+        </ScrollView>
+
+        <ProgressBar
+            android:id="@+id/pbTerminalExecuting"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|end"
+            android:visibility="gone" />
+    </FrameLayout>
+
+    <!-- Quick Action / Ask Siya Suggestion Chips -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="10dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <!-- Ask Siya AI Command Helper -->
+            <LinearLayout
+                android:id="@+id/chipAskSiya"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_jarvis_pill_button"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginEnd="8dp">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_sparkle"
+                    app:tint="#FFFFFF"
+                    android:contentDescription="Ask Siya" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:text="Ask Siya"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/chipLs"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_jarvis_chip"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginEnd="8dp"
+                android:text="ls -la"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/chipUptime"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_jarvis_chip"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginEnd="8dp"
+                android:text="uptime"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/chipDf"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_jarvis_chip"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginEnd="8dp"
+                android:text="df -h"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/chipUname"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_jarvis_chip"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginEnd="8dp"
+                android:text="uname -a"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/chipWhoami"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_jarvis_chip"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginEnd="8dp"
+                android:text="whoami"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+
+            <TextView
+                android:id="@+id/chipEnv"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_jarvis_chip"
+                android:gravity="center"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:layout_marginEnd="8dp"
+                android:text="env"
+                android:textColor="?attr/themeTextPrimary"
+                android:textSize="12sp"
+                android:fontFamily="monospace" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Command Input Bar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="$ "
+            android:textColor="?attr/themeAccent"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:fontFamily="monospace"
+            android:paddingEnd="8dp" />
+
+        <EditText
+            android:id="@+id/etTerminalInput"
+            android:layout_width="0dp"
+            android:layout_height="46dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_input_field"
+            android:hint="Enter shell command..."
+            android:textColor="?attr/themeTextPrimary"
+            android:textColorHint="?attr/themeTextMuted"
+            android:textSize="13sp"
+            android:fontFamily="monospace"
+            android:inputType="textNoSuggestions|textVisiblePassword"
+            android:imeOptions="actionDone"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp" />
+
+        <ImageButton
+            android:id="@+id/btnRunCommand"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_jarvis_icon_square"
+            android:src="@drawable/ic_send_up"
+            app:tint="?attr/themeAccent"
+            android:contentDescription="Run Command" />
+    </LinearLayout>
+
+</LinearLayout>

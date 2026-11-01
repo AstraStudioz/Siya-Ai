@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="220dp"
+    android:maxWidth="320dp"
+    android:orientation="vertical"
+    android:background="@drawable/bg_jarvis_card"
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    android:clipToPadding="true">
+
+    <!-- Header Row (36dp) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="8dp">
+
+        <TextView
+            android:id="@+id/tvCodeLanguage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Code"
+            android:textColor="?attr/themeTextMuted"
+            android:textSize="12sp"
+            android:fontFamily="sans-serif-medium"
+            android:textAllCaps="true" />
+
+        <TextView
+            android:id="@+id/tvCodeStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Generating…"
+            android:textColor="?attr/themeAccent"
+            android:textSize="11sp"
+            android:fontFamily="sans-serif"
+            android:layout_marginEnd="6dp"
+            android:visibility="gone" />
+
+        <ImageButton
+            android:id="@+id/btnCodeExpand"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_code_expand"
+            app:tint="?attr/themeTextMuted"
+            android:contentDescription="Expand Code"
+            android:padding="6dp" />
+
+        <ImageButton
+            android:id="@+id/btnCodeCopy"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_copy"
+            app:tint="?attr/themeTextMuted"
+            android:contentDescription="Copy Code"
+            android:padding="6dp" />
+    </LinearLayout>
+
+    <!-- Code Body Container: Scrollable vertically and horizontally, background ?attr/themeInputBg -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollCodeVertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:background="?attr/themeInputBg">
+
+        <HorizontalScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <TextView
+                android:id="@+id/tvCodeContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:textSize="12sp"
+                android:textColor="?attr/themeTextPrimary"
+                android:textIsSelectable="true"
+                android:padding="10dp" />
+        </HorizontalScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>
