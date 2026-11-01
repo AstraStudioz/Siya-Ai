@@ -290,8 +290,16 @@ class CameraVisionActivity : AppCompatActivity() {
             it.surfaceProvider = binding.previewView.surfaceProvider
         }
 
+        val resolutionSelector = androidx.camera.core.resolutionselector.ResolutionSelector.Builder()
+            .setResolutionStrategy(
+                androidx.camera.core.resolutionselector.ResolutionStrategy(
+                    android.util.Size(768, 768),
+                    androidx.camera.core.resolutionselector.ResolutionStrategy.FALLBACK_RULE_CLOSEST_HIGHER_THEN_LOWER
+                )
+            ).build()
+
         val imageAnalysis = ImageAnalysis.Builder()
-            .setTargetResolution(android.util.Size(768, 768))
+            .setResolutionSelector(resolutionSelector)
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
 

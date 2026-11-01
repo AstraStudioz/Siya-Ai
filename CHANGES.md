@@ -1,5 +1,33 @@
 # Siya AI - Release Notes & Changelog
 
+## Phase 4: Persistence Hardening & CameraX 1.5 Modernization
+- **Room Persistence Hardening (`data/memory/MemoryDatabase.kt`)**:
+  - Enabled schema export (`exportSchema = true`) to prevent accidental schema divergence.
+  - Removed broad destructive migration fallback on upgrade to permanently safeguard learned memory facts.
+  - Added migration array scaffold and restricted destructive resets strictly to downgrade scenarios.
+- **CameraX 1.5 Modernization (`ui/camera/CameraVisionActivity.kt`)**:
+  - Replaced deprecated `setTargetResolution` with modern `ResolutionSelector` and `ResolutionStrategy`.
+- **Validation**:
+  - Added `MemoryDatabaseMigrationTest` ensuring persistence guarantees across future releases.
+
+## Phase 3: Termux & Sandboxed Terminal Engine
+- **CommandGuard Safety Engine (`terminal/CommandGuard.kt`)**:
+  - Intercepts shell commands before execution; classifies into `Safe`, `RequiresConfirmation`, and `Blocked`.
+  - Blocks destructive commands (root/system wiping, device block modification, fork bombs, internet pipe executions).
+  - Sanitizes command logging, redacting API keys, passwords, and tokens.
+- **Sandboxed Local Shell & Termux Bridge (`terminal/TerminalSession.kt`)**:
+  - Runs commands in sandboxed `/system/bin/sh` with working directory set to application files.
+  - Streams stdout/stderr with ANSI escape code stripping and timeout handling.
+  - Bridges to Termux application via `com.termux.RUN_COMMAND` intent service if installed.
+- **Terminal UI (`ui/terminal/TermuxActivity.kt`, `activity_termux.xml`)**:
+  - Monospace scrollable console output adhering to Siya's design system.
+  - Quick action chips (`ls -la`, `uptime`, `df -h`, `uname -a`, `whoami`, `env`).
+  - "Ask Siya" AI terminal helper generating suggested shell commands using Gemini Rest Client.
+- **Gemini Live Integration**:
+  - Added `run_terminal` tool to Gemini Live WebSocket schema and conversation service dispatcher.
+- **Navigation Entry Points**:
+  - Added `btnChatTerminal` in Chat header and "Terminal & Shell Engine" row in Settings Section 2.
+
 ## Phase 2: Realistic Voice Biometrics (Honest, Robust, Measurable)
 
 ### Root Cause Analysis
