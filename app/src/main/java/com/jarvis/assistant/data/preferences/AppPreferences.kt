@@ -52,9 +52,42 @@ class AppPreferences(private val context: Context) {
         // Default operator identity: fill in the default when no name was saved, or when the
         // stored value is the old built-in placeholder. Any intentionally saved custom name is kept.
         val storedName = prefs.getString(KEY_USER_NAME, null)
-        if (storedName.isNullOrBlank() || storedName == LEGACY_OPERATOR_NAME) {
+        if (storedName.isNullOrBlank() || storedName == LEGACY_OPERATOR_NAME || storedName == "ShivuOfc") {
             prefs.edit().putString(KEY_USER_NAME, BrandConfig.DEFAULT_OPERATOR_NAME).apply()
         }
+
+        // Single-key contract: purge any saved third-party keys on startup
+        purgeThirdPartyKeys()
+
+        // Avatar fallback: only "siya" is permitted
+        val currentAvatar = prefs.getString(KEY_TASK_OVERLAY_AVATAR, null)
+        if (currentAvatar != "siya") {
+            prefs.edit().putString(KEY_TASK_OVERLAY_AVATAR, "siya").apply()
+        }
+    }
+
+    private fun purgeThirdPartyKeys() {
+        val keysToRemove = listOf(
+            KEY_CLOUDFLARE_ACCOUNT_ID,
+            KEY_CLOUDFLARE_API_TOKEN,
+            KEY_HUGGING_FACE_API_TOKEN,
+            KEY_POLLINATIONS_API_KEY,
+            KEY_PEXELS_API_KEY,
+            KEY_PIXABAY_API_KEY,
+            KEY_UNSPLASH_ACCESS_KEY,
+            KEY_GOOGLE_PSE_API_KEY,
+            KEY_GOOGLE_PSE_CX,
+            KEY_IMAGE_PROVIDER
+        )
+        try {
+            val encEdit = encryptedPrefs.edit()
+            for (k in keysToRemove) encEdit.remove(k)
+            encEdit.apply()
+        } catch (_: Exception) {}
+
+        val plainEdit = prefs.edit()
+        for (k in keysToRemove) plainEdit.remove(k)
+        plainEdit.apply()
     }
 
     companion object {
@@ -85,6 +118,8 @@ class AppPreferences(private val context: Context) {
         private const val KEY_SILENT_EXECUTION_MODE = "key_silent_execution_mode"
         private const val KEY_TASK_OVERLAY_ENABLED = "key_task_overlay_enabled"
         private const val KEY_TASK_OVERLAY_AVATAR = "key_task_overlay_avatar"
+        val ALLOWED_TASK_OVERLAY_AVATARS = listOf("siya")
+        const val TASK_OVERLAY_DEFAULT_AVATAR = "siya"
         private const val KEY_TASK_OVERLAY_MODE = "key_task_overlay_mode"
         private const val KEY_TASK_OVERLAY_EDGE = "key_task_overlay_edge"
         private const val KEY_TASK_OVERLAY_FREE_POSITION = "key_task_overlay_free_position"
@@ -114,7 +149,49 @@ class AppPreferences(private val context: Context) {
         private const val KEY_GOOGLE_PSE_API_KEY = "key_google_pse_key"
         private const val KEY_GOOGLE_PSE_CX = "key_google_pse_cx"
         private const val KEY_IMAGE_PROVIDER = "key_image_provider"
+
+        const val KEY_UPDATE_AUTO_CHECK = "key_update_auto_check"
+        const val KEY_UPDATE_NOTIFICATIONS = "key_update_notifications"
+        const val KEY_UPDATE_WIFI_ONLY = "key_update_wifi_only"
+        const val KEY_UPDATE_SKIPPED_VERSION = "key_update_skipped_version"
+        const val KEY_UPDATE_CACHED_INFO = "key_update_cached_info"
     }
+
+    var isUpdateAutoCheckEnabled: Boolean
+        get() = prefs.getBoolean(KEY_UPDATE_AUTO_CHECK, true)
+        set(value) = prefs.edit().putBoolean(KEY_UPDATE_AUTO_CHECK, value).apply()
+
+    var isUpdateNotificationsEnabled: Boolean
+        get() = prefs.getBoolean(KEY_UPDATE_NOTIFICATIONS, true)
+        set(value) = prefs.edit().putBoolean(KEY_UPDATE_NOTIFICATIONS, value).apply()
+
+    var isUpdateWifiOnly: Boolean
+        get() = prefs.getBoolean(KEY_UPDATE_WIFI_ONLY, false)
+        set(value) = prefs.edit().putBoolean(KEY_UPDATE_WIFI_ONLY, value).apply()
+
+    var skippedUpdateVersionCode: Int
+        get() = prefs.getInt(KEY_UPDATE_SKIPPED_VERSION, 0)
+        set(value) = prefs.edit().putInt(KEY_UPDATE_SKIPPED_VERSION, value).apply()
+
+    fun getCachedUpdateInfo(): com.jarvis.assistant.data.update.UpdateInfo? {
+        val json = prefs.getString(KEY_UPDATE_CACHED_INFO, null) ?: return null
+        return try {
+            gson.fromJson(json, com.jarvis.assistant.data.update.UpdateInfo::class.java)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    fun saveCachedUpdateInfo(info: com.jarvis.assistant.data.update.UpdateInfo?) {
+        if (info == null) {
+            prefs.edit().remove(KEY_UPDATE_CACHED_INFO).apply()
+        } else {
+            val json = gson.toJson(info)
+            prefs.edit().putString(KEY_UPDATE_CACHED_INFO, json).apply()
+        }
+    }
+
+    fun isVersionSkipped(versionCode: Int): Boolean = skippedUpdateVersionCode == versionCode
 
     var micSensitivity: String
         get() = prefs.getString(KEY_MIC_SENSITIVITY, "normal") ?: "normal"
@@ -265,74 +342,73 @@ class AppPreferences(private val context: Context) {
         }
         set(value) = setSecureString(KEY_API_KEY, value)
 
+    // Single-key contract: Only Gemini API Key is supported and stored.
+    // Third-party keys (Cloudflare, Hugging Face, Pollinations, Pexels, Pixabay, Unsplash, Google PSE)
+    // are purged and their getters always return empty string.
     var cloudflareAccountId: String
-        get() = getSecureString(KEY_CLOUDFLARE_ACCOUNT_ID)
-        set(value) = setSecureString(KEY_CLOUDFLARE_ACCOUNT_ID, value)
+        get() = ""
+        set(_) {}
 
     var cloudflareApiToken: String
-        get() = getSecureString(KEY_CLOUDFLARE_API_TOKEN)
-        set(value) = setSecureString(KEY_CLOUDFLARE_API_TOKEN, value)
+        get() = ""
+        set(_) {}
 
     var huggingFaceApiToken: String
-        get() = getSecureString(KEY_HUGGING_FACE_API_TOKEN)
-        set(value) = setSecureString(KEY_HUGGING_FACE_API_TOKEN, value)
+        get() = ""
+        set(_) {}
 
     var pollinationsApiKey: String
-        get() = getSecureString(KEY_POLLINATIONS_API_KEY)
-        set(value) = setSecureString(KEY_POLLINATIONS_API_KEY, value)
+        get() = ""
+        set(_) {}
 
     var pexelsApiKey: String
-        get() = getSecureString(KEY_PEXELS_API_KEY)
-        set(value) = setSecureString(KEY_PEXELS_API_KEY, value)
+        get() = ""
+        set(_) {}
 
     var pixabayApiKey: String
-        get() = getSecureString(KEY_PIXABAY_API_KEY)
-        set(value) = setSecureString(KEY_PIXABAY_API_KEY, value)
+        get() = ""
+        set(_) {}
 
     var unsplashAccessKey: String
-        get() = getSecureString(KEY_UNSPLASH_ACCESS_KEY)
-        set(value) = setSecureString(KEY_UNSPLASH_ACCESS_KEY, value)
+        get() = ""
+        set(_) {}
 
     var googlePseApiKey: String
-        get() = getSecureString(KEY_GOOGLE_PSE_API_KEY)
-        set(value) = setSecureString(KEY_GOOGLE_PSE_API_KEY, value)
+        get() = ""
+        set(_) {}
 
     var googlePseCx: String
-        get() = getSecureString(KEY_GOOGLE_PSE_CX)
-        set(value) = setSecureString(KEY_GOOGLE_PSE_CX, value)
+        get() = ""
+        set(_) {}
 
     var imageProvider: String
-        get() = prefs.getString(KEY_IMAGE_PROVIDER, "auto") ?: "auto"
-        set(value) = prefs.edit().putString(KEY_IMAGE_PROVIDER, value).apply()
+        get() = "auto"
+        set(_) {}
+
+    // Gemini Image Quota tracking: Remember quota/plan error for 24 hours
+    var lastGeminiImageQuotaErrorTime: Long
+        get() = prefs.getLong("key_gemini_image_quota_error_time", 0L)
+        set(value) = prefs.edit().putLong("key_gemini_image_quota_error_time", value).apply()
+
+    fun isGeminiImageQuotaBlocked(): Boolean {
+        val lastErr = lastGeminiImageQuotaErrorTime
+        return lastErr > 0L && (System.currentTimeMillis() - lastErr) < 24 * 60 * 60 * 1000L
+    }
+
+    fun recordGeminiImageQuotaError() {
+        lastGeminiImageQuotaErrorTime = System.currentTimeMillis()
+    }
+
+    fun clearGeminiImageQuotaError() {
+        lastGeminiImageQuotaErrorTime = 0L
+    }
 
     fun clearAllSecureApiKeys() {
         try {
-            val secureEditor = encryptedPrefs.edit()
-            secureEditor.remove(KEY_API_KEY)
-            secureEditor.remove(KEY_CLOUDFLARE_ACCOUNT_ID)
-            secureEditor.remove(KEY_CLOUDFLARE_API_TOKEN)
-            secureEditor.remove(KEY_HUGGING_FACE_API_TOKEN)
-            secureEditor.remove(KEY_POLLINATIONS_API_KEY)
-            secureEditor.remove(KEY_PEXELS_API_KEY)
-            secureEditor.remove(KEY_PIXABAY_API_KEY)
-            secureEditor.remove(KEY_UNSPLASH_ACCESS_KEY)
-            secureEditor.remove(KEY_GOOGLE_PSE_API_KEY)
-            secureEditor.remove(KEY_GOOGLE_PSE_CX)
-            secureEditor.apply()
+            encryptedPrefs.edit().remove(KEY_API_KEY).apply()
         } catch (_: Exception) {}
-
-        val plainEditor = prefs.edit()
-        plainEditor.remove(KEY_API_KEY)
-        plainEditor.remove(KEY_CLOUDFLARE_ACCOUNT_ID)
-        plainEditor.remove(KEY_CLOUDFLARE_API_TOKEN)
-        plainEditor.remove(KEY_HUGGING_FACE_API_TOKEN)
-        plainEditor.remove(KEY_POLLINATIONS_API_KEY)
-        plainEditor.remove(KEY_PEXELS_API_KEY)
-        plainEditor.remove(KEY_PIXABAY_API_KEY)
-        plainEditor.remove(KEY_UNSPLASH_ACCESS_KEY)
-        plainEditor.remove(KEY_GOOGLE_PSE_API_KEY)
-        plainEditor.remove(KEY_GOOGLE_PSE_CX)
-        plainEditor.apply()
+        prefs.edit().remove(KEY_API_KEY).apply()
+        purgeThirdPartyKeys()
     }
 
     var aiModel: String
@@ -489,10 +565,13 @@ class AppPreferences(private val context: Context) {
         set(value) = prefs.edit().putBoolean(KEY_TASK_OVERLAY_ENABLED, value).apply()
 
     var taskOverlayAvatar: String
-        get() = prefs.getString(KEY_TASK_OVERLAY_AVATAR, "ghost") ?: "ghost"
+        get() {
+            val stored = prefs.getString(KEY_TASK_OVERLAY_AVATAR, "siya") ?: "siya"
+            return if (stored == "siya") "siya" else "siya"
+        }
         set(value) {
-            val available = listOf("alien", "blob", "cat", "circle", "cloud", "droid", "drop", "flower", "ghost", "hexagon", "mech", "pebble", "pill", "puddle", "siya", "square", "star", "triangle")
-            prefs.edit().putString(KEY_TASK_OVERLAY_AVATAR, value.takeIf { it in available } ?: "ghost").apply()
+            val available = listOf("siya")
+            prefs.edit().putString(KEY_TASK_OVERLAY_AVATAR, if (value in available) value else "siya").apply()
         }
 
     /** always keeps the avatar visible while the service is alive; working limits it to active tasks. */

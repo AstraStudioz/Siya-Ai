@@ -47,6 +47,14 @@ class GeminiLiveWebSocket(
             .retryOnConnectionFailure(true)
             .pingInterval(60, TimeUnit.SECONDS)
             .build()
+
+        fun buildMediaChunkJson(base64Image: String): String {
+            return "{\"realtimeInput\":{\"mediaChunks\":[{\"mimeType\":\"image/jpeg\",\"data\":\"$base64Image\"}]}}"
+        }
+
+        fun buildAudioChunkJson(base64Audio: String): String {
+            return "{\"realtimeInput\":{\"mediaChunks\":[{\"mimeType\":\"audio/pcm;rate=16000\",\"data\":\"$base64Audio\"}]}}"
+        }
     }
 
     private val client = sharedClient
@@ -283,6 +291,8 @@ class GeminiLiveWebSocket(
                 put("outputAudioTranscription", JSONObject())
                 put("generation_config", JSONObject().apply {
                     put("response_modalities", JSONArray().put("AUDIO"))
+                    put("inputAudioTranscription", JSONObject())
+                    put("outputAudioTranscription", JSONObject())
                     put("speech_config", JSONObject().apply {
                         put("voice_config", JSONObject().apply {
                             put("prebuilt_voice_config", JSONObject().apply {
@@ -1029,7 +1039,7 @@ class GeminiLiveWebSocket(
                 Log.i(TAG, "Streaming audio to Gemini Live: 16-bit mono little-endian PCM at 16 kHz (mimeType=audio/pcm;rate=16000)")
             }
             val base64Audio = Base64.encodeToString(pcm16k, Base64.NO_WRAP)
-            val json = "{\"realtimeInput\":{\"mediaChunks\":[{\"mimeType\":\"audio/pcm;rate=16000\",\"data\":\"$base64Audio\"}]}}"
+            val json = buildAudioChunkJson(base64Audio)
             webSocket?.send(json)
         } catch (e: Exception) {
             Log.e(TAG, "Error sending audio chunk: ${e.message}")
@@ -1054,7 +1064,7 @@ class GeminiLiveWebSocket(
         }
         try {
             val base64Image = Base64.encodeToString(jpegBytes, Base64.NO_WRAP)
-            val json = "{\"realtimeInput\":{\"video\":{\"mimeType\":\"image/jpeg\",\"data\":\"$base64Image\"}}}"
+            val json = buildMediaChunkJson(base64Image)
             val sent = webSocket?.send(json) ?: false
             mediaChunksSent++
             if (mediaChunksSent % 10 == 1) {

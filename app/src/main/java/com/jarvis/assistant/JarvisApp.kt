@@ -84,6 +84,7 @@ class JarvisApp : Application() {
         )
 
         VoskModelManager.init(this, CoroutineScope(Dispatchers.Default))
+        com.jarvis.assistant.update.UpdateManager.initialize(this)
 
         try {
             val webviewDir = java.io.File(dataDir, "app_webview")

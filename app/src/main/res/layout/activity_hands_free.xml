@@ -623,9 +623,9 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_social_telegram"
+                        android:src="@drawable/ic_official_website"
                         app:tint="?attr/themeAccent"
-                        android:contentDescription="Official Telegram" />
+                        android:contentDescription="Official Website" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -637,7 +637,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Official Telegram Channel"
+                            android:text="Official Website"
                             android:textColor="?attr/themeTextPrimary"
                             android:textSize="15sp"
                             android:textStyle="bold"
@@ -646,7 +646,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Official updates, release notes, and news"
+                            android:text="alphabits.site • Documentation &amp; Updates"
                             android:textColor="?attr/themeTextMuted"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -664,7 +664,7 @@
                     android:layout_height="1dp"
                     android:background="?attr/themeCardBorder" />
 
-                <!-- Discussion Group Telegram -->
+                <!-- YouTube Channel -->
                 <LinearLayout
                     android:id="@+id/btnHandsFreeDiscussion"
                     android:layout_width="match_parent"
@@ -679,9 +679,9 @@
                     <ImageView
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_social_telegram"
+                        android:src="@drawable/ic_official_youtube"
                         app:tint="?attr/themeAccent"
-                        android:contentDescription="Discussion Group" />
+                        android:contentDescription="YouTube Channel" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -693,7 +693,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Telegram Discussion Group"
+                            android:text="YouTube Channel"
                             android:textColor="?attr/themeTextPrimary"
                             android:textSize="15sp"
                             android:textStyle="bold"
@@ -702,7 +702,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Community discussions, feedback, and development updates"
+                            android:text="@alphabit_s • Feature tutorials and walkthroughs"
                             android:textColor="?attr/themeTextMuted"
                             android:textSize="12sp" />
                     </LinearLayout>
@@ -716,7 +716,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Community Links -->
+            <!-- Unified Footer -->
             <TextView
                 android:id="@+id/tvFooterHandsFree"
                 android:clickable="true"
@@ -724,10 +724,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="SIYA AI • Engineered by ShivuOfc\nAutonomous Hands-Free Architecture"
+                android:text="Siya Ai • Crafted by Alpha Bits • alphabits.site"
                 android:textColor="?attr/themeTextMuted"
-                android:textSize="11.5sp"
-                android:lineSpacingExtra="3dp" />
+                android:textSize="12sp"
+                android:fontFamily="sans-serif"
+                android:layout_marginBottom="24dp" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

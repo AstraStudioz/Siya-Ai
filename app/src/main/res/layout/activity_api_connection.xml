@@ -272,11 +272,11 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card 2B: Image Generation Credentials & Providers -->
+            <!-- Card 2B: Key-Free Image Generation Engine -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Image Generation Providers"
+                android:text="Key-Free Image Generation"
                 android:textColor="?attr/themeTextMuted"
                 android:textSize="13sp"
                 android:fontFamily="sans-serif-medium"
@@ -294,7 +294,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Multi-Provider Image Fallback"
+                    android:text="Zero-Key Neural Image Engine"
                     android:textColor="?attr/themeTextPrimary"
                     android:textSize="15sp"
                     android:fontFamily="sans-serif-medium"
@@ -303,203 +303,11 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Automatic fallback to Cloudflare, Hugging Face, or Pollinations (Free)"
+                    android:text="No secondary keys required. Image generation automatically cascades across Gemini Imagen/Flash (if permitted by your project) → Pollinations.ai (free) → AI Horde (anonymous keyless)."
                     android:textColor="?attr/themeTextMuted"
                     android:textSize="12sp"
                     android:fontFamily="sans-serif"
-                    android:layout_marginTop="2dp" />
-
-                <RadioGroup
-                    android:id="@+id/rgImageProviderGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp">
-
-                    <RadioButton
-                        android:id="@+id/rbImageProviderAuto"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Auto (Gemini → Cloudflare → HF → Pollinations)"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp" />
-
-                    <RadioButton
-                        android:id="@+id/rbImageProviderGemini"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Google Imagen 3 (Default with Gemini key)"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp" />
-
-                    <RadioButton
-                        android:id="@+id/rbImageProviderCloudflare"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Cloudflare Workers AI (FLUX.1-schnell)"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp" />
-
-                    <RadioButton
-                        android:id="@+id/rbImageProviderHuggingFace"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Hugging Face Inference (FLUX.1-schnell)"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp" />
-
-                    <RadioButton
-                        android:id="@+id/rbImageProviderPollinations"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Pollinations.ai (Free • Zero Setup)"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif-medium"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp" />
-                </RadioGroup>
-
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?attr/themeCardBorder"
-                    android:layout_marginTop="12dp"
-                    android:layout_marginBottom="12dp" />
-
-                <!-- Cloudflare Fields -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Cloudflare Workers AI"
-                    android:textColor="?attr/themeTextPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxStrokeColor="?attr/themeAccent">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etCloudflareAccountId"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Account ID"
-                        android:inputType="text"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxStrokeColor="?attr/themeAccent"
-                    app:passwordToggleEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etCloudflareApiToken"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="API Token"
-                        android:inputType="textPassword"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Hugging Face Field -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hugging Face API Token"
-                    android:textColor="?attr/themeTextPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxStrokeColor="?attr/themeAccent"
-                    app:passwordToggleEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etHuggingFaceApiToken"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="hf_..."
-                        android:inputType="textPassword"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Pollinations Key Field -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pollinations API Key (Optional)"
-                    android:textColor="?attr/themeTextPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxStrokeColor="?attr/themeAccent"
-                    app:passwordToggleEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etPollinationsApiKey"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Optional custom key (leave blank for free)"
-                        android:inputType="textPassword"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif" />
-                </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginTop="4dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnTestImageGeneration"
@@ -508,7 +316,7 @@
                     android:layout_height="40dp"
                     app:strokeColor="?attr/themeAccent"
                     app:strokeWidth="1dp"
-                    android:text="Test Image Generation"
+                    android:text="Test Key-Free Image Generation"
                     android:textColor="?attr/themeAccent"
                     android:textSize="12sp"
                     android:textAllCaps="false"
@@ -528,202 +336,6 @@
                     android:fontFamily="sans-serif-medium"
                     android:layout_marginTop="8dp"
                     android:visibility="gone" />
-            </LinearLayout>
-
-            <!-- Card 2C: Stock Photos & Visual Search Credentials -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Visual Search &amp; Stock Photos"
-                android:textColor="?attr/themeTextMuted"
-                android:textSize="13sp"
-                android:fontFamily="sans-serif-medium"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_jarvis_card"
-                android:padding="18dp"
-                android:layout_marginBottom="18dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Stock Photos &amp; Image Search"
-                    android:textColor="?attr/themeTextPrimary"
-                    android:textSize="15sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Credentials for Unsplash, Pexels, Pixabay, and Google PSE"
-                    android:textColor="?attr/themeTextMuted"
-                    android:textSize="12sp"
-                    android:fontFamily="sans-serif"
-                    android:layout_marginTop="2dp" />
-
-                <!-- Unsplash -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Unsplash Access Key"
-                    android:textColor="?attr/themeTextPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:layout_marginTop="12dp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxStrokeColor="?attr/themeAccent"
-                    app:passwordToggleEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etUnsplashAccessKey"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Unsplash Access Key"
-                        android:inputType="textPassword"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Pexels -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pexels API Key"
-                    android:textColor="?attr/themeTextPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:layout_marginTop="10dp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxStrokeColor="?attr/themeAccent"
-                    app:passwordToggleEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etPexelsApiKey"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Pexels API Key"
-                        android:inputType="textPassword"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Pixabay -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Pixabay API Key"
-                    android:textColor="?attr/themeTextPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:layout_marginTop="10dp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxStrokeColor="?attr/themeAccent"
-                    app:passwordToggleEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etPixabayApiKey"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Pixabay API Key"
-                        android:inputType="textPassword"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Google PSE -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Google Programmable Search Engine (PSE)"
-                    android:textColor="?attr/themeTextPrimary"
-                    android:textSize="13sp"
-                    android:fontFamily="sans-serif-medium"
-                    android:textStyle="bold"
-                    android:layout_marginTop="10dp" />
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxStrokeColor="?attr/themeAccent"
-                    app:passwordToggleEnabled="true">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etGooglePseApiKey"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Google Search API Key"
-                        android:inputType="textPassword"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    app:boxBackgroundMode="outline"
-                    app:boxCornerRadiusTopStart="12dp"
-                    app:boxCornerRadiusTopEnd="12dp"
-                    app:boxCornerRadiusBottomStart="12dp"
-                    app:boxCornerRadiusBottomEnd="12dp"
-                    app:boxStrokeColor="?attr/themeAccent">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etGooglePseCx"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Search Engine ID (cx)"
-                        android:inputType="text"
-                        android:textColor="?attr/themeTextPrimary"
-                        android:textSize="13sp"
-                        android:fontFamily="sans-serif" />
-                </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
             <!-- Card 3: AI Model Engine -->
@@ -848,6 +460,19 @@
                         android:fontFamily="sans-serif" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
+
+            <!-- Unified Footer -->
+            <TextView
+                android:id="@+id/tvUnifiedFooter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Siya Ai • Crafted by Alpha Bits • alphabits.site"
+                android:textColor="?attr/themeTextMuted"
+                android:textSize="12sp"
+                android:gravity="center"
+                android:fontFamily="sans-serif"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp" />
 
         </LinearLayout>
     </ScrollView>

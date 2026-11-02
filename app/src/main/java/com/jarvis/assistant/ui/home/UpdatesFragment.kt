@@ -87,12 +87,46 @@ class UpdatesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         com.jarvis.assistant.util.ThemeManager.applyDynamicBackground(binding.root)
+        observeAvailableUpdate()
+    }
+
+    private fun observeAvailableUpdate() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+                com.jarvis.assistant.update.UpdateManager.availableUpdateFlow.collect { updateInfo ->
+                    val info = updateInfo ?: com.jarvis.assistant.JarvisApp.instance.preferences.getCachedUpdateInfo()
+                    val isNewer = info != null && info.versionCode > com.jarvis.assistant.BuildConfig.VERSION_CODE
+                    if (isNewer && info != null) {
+                        binding.cardUpdateBanner.visibility = View.VISIBLE
+                        binding.tvBannerVersion.text = "v${info.versionName} (Build ${info.versionCode})"
+                        binding.tvBannerTitle.text = "Siya AI update v${info.versionName} available"
+                        binding.tvBannerChangelog.text = info.changelog.ifBlank { "Performance improvements and neural stability updates." }
+
+                        binding.btnBannerUpdateNow.setOnClickListener {
+                            val bottomSheet = com.jarvis.assistant.update.UpdateDownloadBottomSheet(info)
+                            bottomSheet.show(parentFragmentManager, "UpdateDownloadBottomSheet")
+                        }
+
+                        binding.btnBannerDismiss.setOnClickListener {
+                            binding.cardUpdateBanner.visibility = View.GONE
+                        }
+                    } else {
+                        binding.cardUpdateBanner.visibility = View.GONE
+                    }
+                }
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
         if (_binding != null) {
             com.jarvis.assistant.util.ThemeManager.applyDynamicBackground(binding.root)
+            val cached = com.jarvis.assistant.JarvisApp.instance.preferences.getCachedUpdateInfo()
+            if (cached != null && cached.versionCode > com.jarvis.assistant.BuildConfig.VERSION_CODE) {
+                binding.cardUpdateBanner.visibility = View.VISIBLE
+                binding.tvBannerVersion.text = "v${cached.versionName} (Build ${cached.versionCode})"
+            }
         }
     }
 

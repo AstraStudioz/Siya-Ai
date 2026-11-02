@@ -215,9 +215,13 @@ class CameraVisionActivity : AppCompatActivity() {
                 if (viewModel.isMicMuted.value) {
                     viewModel.toggleMicMute()
                 }
+                JarvisConversationService.ensureAudioCapture()
                 monitorSessionStatus()
             } else {
                 viewModel.toggleMicMute()
+                if (!viewModel.isMicMuted.value) {
+                    JarvisConversationService.ensureAudioCapture()
+                }
             }
         }
     }
@@ -502,6 +506,10 @@ class CameraVisionActivity : AppCompatActivity() {
                         binding.btnMicToggle.setImageResource(
                             if (isMuted) R.drawable.ic_mic_mute_jarvis else R.drawable.ic_mic_jarvis
                         )
+                        val colorAttr = if (isMuted) R.attr.themeTextMuted else R.attr.themeAccent
+                        val typedValue = android.util.TypedValue()
+                        theme.resolveAttribute(colorAttr, typedValue, true)
+                        binding.btnMicToggle.imageTintList = android.content.res.ColorStateList.valueOf(typedValue.data)
                     }
                 }
 

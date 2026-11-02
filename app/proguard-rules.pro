@@ -19,3 +19,17 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Data Models & Update System Serialization (Gson)
+-keep class com.jarvis.assistant.data.update.** { *; }
+-keepclassmembers class com.jarvis.assistant.data.update.** { *; }
+
+-keep class com.jarvis.assistant.data.model.** { *; }
+-keepclassmembers class com.jarvis.assistant.data.model.** { *; }
+
+# WorkManager Workers
+-keep class com.jarvis.assistant.update.UpdateCheckWorker { *; }
+-keep class * extends androidx.work.ListenableWorker {
+    public <init>(android.content.Context, androidx.work.WorkerParameters);
+}
+

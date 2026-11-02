@@ -16,8 +16,15 @@ android {
     applicationId = "com.aistudio.siyaai.qwrzp"
     minSdk = 26
     targetSdk = 35
-    versionCode = 146
-    versionName = "1.0.146"
+    val buildVersionCode = project.findProperty("versionCode")?.toString()?.toIntOrNull()
+        ?: System.getenv("VERSION_CODE")?.toIntOrNull()
+        ?: 146
+    val buildVersionName = project.findProperty("versionName")?.toString()
+        ?: System.getenv("VERSION_NAME")
+        ?: "1.0.146"
+
+    versionCode = buildVersionCode
+    versionName = buildVersionName
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
   }
@@ -29,7 +36,7 @@ android {
       val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
       storeFile = file(keystorePath)
       storePassword = System.getenv("STORE_PASSWORD")
-      keyAlias = "upload"
+      keyAlias = System.getenv("KEY_ALIAS") ?: "upload"
       keyPassword = System.getenv("KEY_PASSWORD")
     }
     create("debugConfig") {

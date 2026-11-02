@@ -298,4 +298,46 @@ class GeminiLiveSessionTest {
         processAmplitude(0.02f, 5100L)
         assertFalse(isMicSilenced)
     }
+
+    @Test
+    fun testMediaChunkJsonFormatCompliesWithMultimodalLiveApi() {
+        val dummyBase64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+        val jsonString = GeminiLiveWebSocket.buildMediaChunkJson(dummyBase64)
+
+        // Must NOT use the obsolete 'video' key under realtimeInput
+        assertFalse("JSON must not contain obsolete 'video' wrapper", jsonString.contains("\"video\":"))
+
+        // Must contain mediaChunks array with mimeType image/jpeg
+        assertTrue("JSON must contain mediaChunks", jsonString.contains("\"mediaChunks\":"))
+        assertTrue("JSON must contain mimeType image/jpeg", jsonString.contains("\"mimeType\":\"image/jpeg\""))
+        assertTrue("JSON must contain base64 payload", jsonString.contains("\"data\":\"$dummyBase64\""))
+
+        // Verify JSON parsing with Gson
+        val jsonElement = com.google.gson.JsonParser.parseString(jsonString).asJsonObject
+        assertTrue(jsonElement.has("realtimeInput"))
+        val realtimeInput = jsonElement.getAsJsonObject("realtimeInput")
+        assertFalse(realtimeInput.has("video"))
+        assertTrue(realtimeInput.has("mediaChunks"))
+        val mediaChunks = realtimeInput.getAsJsonArray("mediaChunks")
+        assertEquals(1, mediaChunks.size())
+        val firstChunk = mediaChunks.get(0).asJsonObject
+        assertEquals("image/jpeg", firstChunk.get("mimeType").asString)
+        assertEquals(dummyBase64, firstChunk.get("data").asString)
+    }
+
+    @Test
+    fun testAudioChunkJsonFormatCompliesWithMultimodalLiveApi() {
+        val dummyAudioBase64 = "AAAA//8AAP//"
+        val jsonString = GeminiLiveWebSocket.buildAudioChunkJson(dummyAudioBase64)
+
+        val jsonElement = com.google.gson.JsonParser.parseString(jsonString).asJsonObject
+        assertTrue(jsonElement.has("realtimeInput"))
+        val realtimeInput = jsonElement.getAsJsonObject("realtimeInput")
+        assertTrue(realtimeInput.has("mediaChunks"))
+        val mediaChunks = realtimeInput.getAsJsonArray("mediaChunks")
+        assertEquals(1, mediaChunks.size())
+        val firstChunk = mediaChunks.get(0).asJsonObject
+        assertEquals("audio/pcm;rate=16000", firstChunk.get("mimeType").asString)
+        assertEquals(dummyAudioBase64, firstChunk.get("data").asString)
+    }
 }

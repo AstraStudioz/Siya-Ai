@@ -36,7 +36,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Overlay Avatars"
+                android:text="Overlay Avatar"
                 android:textColor="?attr/themeTextPrimary"
                 android:textSize="20sp"
                 android:fontFamily="sans-serif-medium"
@@ -45,131 +45,181 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Pick the companion shown while Siya Ai works"
+                android:text="Neural companion overlay for Siya Ai"
                 android:textColor="?attr/themeTextMuted"
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 
-    <com.google.android.material.card.MaterialCardView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="14dp"
-        app:cardBackgroundColor="?attr/themeCardBg"
-        app:strokeColor="?attr/themeCardBorder"
-        app:strokeWidth="1dp"
-        app:cardCornerRadius="18dp">
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/switchOverlayEnabled"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="64dp"
-            android:paddingStart="18dp"
-            android:paddingEnd="18dp"
-            android:text="Show floating overlay"
-            android:textColor="?attr/themeTextPrimary"
-            android:textSize="15sp" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="12dp"
-        app:cardBackgroundColor="?attr/themeCardBg"
-        app:strokeColor="?attr/themeCardBorder"
-        app:strokeWidth="1dp"
-        app:cardCornerRadius="16dp">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="14dp">
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Avatar visibility"
-                android:textColor="?attr/themeTextPrimary"
-                android:textStyle="bold"
-                android:textSize="14sp" />
-
-            <RadioGroup
-                android:id="@+id/radioOverlayMode"
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="?attr/themeCardBg"
+                app:strokeColor="?attr/themeCardBorder"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="18dp">
 
-                <RadioButton
-                    android:id="@+id/rbOverlayWorking"
-                    android:layout_width="0dp"
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/switchOverlayEnabled"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="While working"
+                    android:minHeight="64dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="Show floating overlay"
                     android:textColor="?attr/themeTextPrimary"
-                    android:textSize="12sp" />
+                    android:textSize="15sp" />
+            </com.google.android.material.card.MaterialCardView>
 
-                <RadioButton
-                    android:id="@+id/rbOverlayAlways"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Always on"
-                    android:textColor="?attr/themeTextPrimary"
-                    android:textSize="12sp" />
-            </RadioGroup>
-
-            <TextView
-                android:layout_width="wrap_content"
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Dock the avatar to an edge; dragging it will choose the nearest edge."
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="14dp"
+                app:cardBackgroundColor="?attr/themeCardBg"
+                app:strokeColor="?attr/themeCardBorder"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Avatar visibility"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+
+                    <RadioGroup
+                        android:id="@+id/radioOverlayMode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/rbOverlayWorking"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="While working"
+                            android:textColor="?attr/themeTextPrimary"
+                            android:textSize="12sp" />
+
+                        <RadioButton
+                            android:id="@+id/rbOverlayAlways"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Always on"
+                            android:textColor="?attr/themeTextPrimary"
+                            android:textSize="12sp" />
+                    </RadioGroup>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dock the avatar to an edge; dragging it will choose the nearest edge."
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="11sp" />
+
+                    <Spinner
+                        android:id="@+id/spinnerOverlayEdge"
+                        android:layout_width="match_parent"
+                        android:layout_height="44dp"
+                        android:entries="@array/overlay_edges"
+                        android:spinnerMode="dropdown" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Single Siya Avatar Preview Card -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="?attr/themeCardBg"
+                app:strokeColor="?attr/themeCardBorder"
+                app:strokeWidth="1dp"
+                app:cardCornerRadius="18dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Siya Neural Avatar"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:fontFamily="sans-serif-medium" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Siya's default neural avatar; responsive to voice and emotion"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="12sp"
+                        android:gravity="center"
+                        android:fontFamily="sans-serif"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="16dp" />
+
+                    <FrameLayout
+                        android:layout_width="160dp"
+                        android:layout_height="160dp"
+                        android:background="@drawable/bg_jarvis_icon_square">
+
+                        <WebView
+                            android:id="@+id/avatarPreview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:overScrollMode="never"
+                            android:scrollbars="none" />
+                    </FrameLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Unified Footer -->
+            <TextView
+                android:id="@+id/tvUnifiedFooter"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Siya Ai • Crafted by Alpha Bits • alphabits.site"
                 android:textColor="?attr/themeTextMuted"
-                android:textSize="11sp" />
+                android:textSize="12sp"
+                android:gravity="center"
+                android:fontFamily="sans-serif"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp" />
 
-            <Spinner
-                android:id="@+id/spinnerOverlayEdge"
-                android:layout_width="match_parent"
-                android:layout_height="44dp"
-                android:entries="@array/overlay_edges"
-                android:spinnerMode="dropdown" />
         </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="22dp"
-        android:paddingEnd="22dp"
-        android:paddingBottom="8dp"
-        android:text="CHOOSE AN AVATAR"
-        android:textColor="?attr/themeTextMuted"
-        android:textSize="11sp"
-        android:letterSpacing="0.08"
-        android:fontFamily="sans-serif-medium"
-        android:textStyle="bold" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="22dp"
-        android:paddingEnd="22dp"
-        android:paddingBottom="10dp"
-        android:text="Tap an avatar to select it. Double-tap the floating avatar to see task progress."
-        android:textColor="?attr/themeTextMuted"
-        android:textSize="12sp" />
-
-    <WebView
-        android:id="@+id/avatarGallery"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@android:color/transparent"
-        android:overScrollMode="never"
-        android:scrollbars="none" />
+    </ScrollView>
 </LinearLayout>

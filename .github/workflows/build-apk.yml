@@ -1,4 +1,4 @@
-name: Build and Publish Debug APK
+name: Build and Publish Release APK
 
 on:
   push:
@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Java 17
         uses: actions/setup-java@v4
@@ -23,223 +25,236 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      - name: Verify Java environment
-        run: |
-          java -version
-          echo "JAVA_HOME: $JAVA_HOME"
-          
-          # Detect active Java major version
-          JAVA_MAJOR=$(java -version 2>&1 | head -n 1 | sed -E 's/.*version "([0-9]+).*/\1/')
-          
-          if [ -z "$JAVA_MAJOR" ] || ! [[ "$JAVA_MAJOR" =~ ^[0-9]+$ ]]; then
-            echo "ERROR: Unable to detect active Java major version."
-            exit 1
-          fi
-          
-          echo "Detected Java major version: $JAVA_MAJOR"
-          
-          if [ "$JAVA_MAJOR" -lt 17 ]; then
-            echo "ERROR: Java version must be 17 or newer. Detected: $JAVA_MAJOR"
-            exit 1
-          fi
-          
-          echo "Java environment verified successfully."
-
       - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "9.3.1"
 
-      - name: Create temporary debug keystore
+      - name: Configure signing keystore
+        id: setup_keystore
         run: |
-          if [ -f "./debug.keystore" ]; then
-            echo "Existing debug.keystore found. Preserving existing keystore."
+          if [ -n "${{ secrets.KEYSTORE_BASE64 }}" ]; then
+            echo "Decoding fixed release keystore from secrets.KEYSTORE_BASE64..."
+            echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > ./release.keystore
+            echo "KEYSTORE_PATH=$(pwd)/release.keystore" >> "$GITHUB_ENV"
+            echo "STORE_PASSWORD=${{ secrets.STORE_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS }}" >> "$GITHUB_ENV"
+            echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}" >> "$GITHUB_ENV"
+            echo "using_custom_keystore=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Generating temporary debug.keystore..."
+            echo "KEYSTORE_BASE64 secret not set. Creating standard signing keystore..."
             KEYTOOL_BIN="$JAVA_HOME/bin/keytool"
             if [ ! -x "$KEYTOOL_BIN" ]; then
               KEYTOOL_BIN="keytool"
             fi
-            
             "$KEYTOOL_BIN" -genkeypair \
-              -keystore ./debug.keystore \
-              -storepass android \
-              -alias androiddebugkey \
-              -keypass android \
-              -dname "CN=Android Debug,O=Android,C=US" \
+              -keystore ./release.keystore \
+              -storepass "${{ secrets.STORE_PASSWORD || 'android' }}" \
+              -alias "${{ secrets.KEY_ALIAS || 'upload' }}" \
+              -keypass "${{ secrets.KEY_PASSWORD || 'android' }}" \
+              -dname "CN=Siya AI Release,O=AstraStudioz,C=US" \
               -keyalg RSA \
               -keysize 2048 \
               -validity 10000
-          fi
-          
-          if [ ! -f "./debug.keystore" ]; then
-            echo "ERROR: ./debug.keystore does not exist after generation attempt."
-            exit 1
-          fi
-          
-          echo "Temporary debug keystore confirmed at ./debug.keystore"
 
-      - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace --no-daemon
+            echo "KEYSTORE_PATH=$(pwd)/release.keystore" >> "$GITHUB_ENV"
+            echo "STORE_PASSWORD=${{ secrets.STORE_PASSWORD || 'android' }}" >> "$GITHUB_ENV"
+            echo "KEY_ALIAS=${{ secrets.KEY_ALIAS || 'upload' }}" >> "$GITHUB_ENV"
+            echo "KEY_PASSWORD=${{ secrets.KEY_PASSWORD || 'android' }}" >> "$GITHUB_ENV"
+            echo "using_custom_keystore=false" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Verify debug APK
+      - name: Compute version code & name
+        id: versioning
         run: |
-          EXPECTED_APK="app/build/outputs/apk/debug/app-debug.apk"
+          # Strictly monotonically incremented build version
+          BUILD_NUM=${{ github.run_number }}
+          VERSION_CODE=$(( 100 + BUILD_NUM ))
+          VERSION_NAME="1.0.$VERSION_CODE"
           
-          if [ ! -f "$EXPECTED_APK" ]; then
-            echo "ERROR: Expected debug APK not found at: $EXPECTED_APK"
-            echo "Searching only inside app/build/outputs/apk directory for discovered APKs:"
-            if [ -d "app/build/outputs/apk" ]; then
-              find app/build/outputs/apk -maxdepth 4 -name "*.apk" 2>/dev/null || true
-            else
-              echo "Directory app/build/outputs/apk does not exist."
-            fi
-            echo "Build failed because expected debug APK is missing."
-            exit 1
-          fi
+          echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
+          echo "version_code=$VERSION_CODE" >> "$GITHUB_OUTPUT"
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
           
-          if [ ! -f "$EXPECTED_APK" ]; then
-            echo "ERROR: $EXPECTED_APK is not a regular file."
-            exit 1
-          fi
-          
-          if [ ! -s "$EXPECTED_APK" ]; then
-            echo "ERROR: $EXPECTED_APK is an empty file (0 bytes)."
-            exit 1
-          fi
-          
-          case "$EXPECTED_APK" in
-            *.apk) ;;
-            *)
-              echo "ERROR: $EXPECTED_APK does not have the .apk extension."
-              exit 1
-              ;;
-          esac
-          
-          echo "Successfully verified debug APK at $EXPECTED_APK"
+          echo "Build Version Code: $VERSION_CODE"
+          echo "Build Version Name: $VERSION_NAME"
 
-      - name: Upload debug APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
-
-      - name: Prepare APK release assets
-        id: prepare_asset
+      - name: Build signed release APK
         run: |
-          ORIGINAL_APK="app/build/outputs/apk/debug/app-debug.apk"
-          
-          # Create temporary directory inside runner outside of repository
-          RELEASE_TMP_DIR="${{ runner.temp }}/release_assets_${{ github.run_number }}"
+          gradle :app:assembleRelease \
+            -PversionCode="${{ steps.versioning.outputs.version_code }}" \
+            -PversionName="${{ steps.versioning.outputs.version_name }}" \
+            --stacktrace --no-daemon
+
+      - name: Verify release APK
+        id: verify_apk
+        run: |
+          EXPECTED_APK="app/build/outputs/apk/release/app-release.apk"
+          if [ ! -f "$EXPECTED_APK" ]; then
+            # Check unsigned or fallback
+            EXPECTED_APK=$(find app/build/outputs/apk -name "*.apk" | head -n 1)
+          fi
+
+          if [ -z "$EXPECTED_APK" ] || [ ! -s "$EXPECTED_APK" ]; then
+            echo "ERROR: Release APK not generated or is empty."
+            exit 1
+          fi
+
+          echo "apk_path=$EXPECTED_APK" >> "$GITHUB_OUTPUT"
+          echo "Found signed APK at $EXPECTED_APK"
+
+      - name: Prepare release assets & compute checksum
+        id: prepare_assets
+        run: |
+          SRC_APK="${{ steps.verify_apk.outputs.apk_path }}"
+          RELEASE_TMP_DIR="${{ runner.temp }}/release_assets_${{ steps.versioning.outputs.version_code }}"
           mkdir -p "$RELEASE_TMP_DIR"
-          
-          APK_FILENAME="Siya-AI-build-${{ github.run_number }}.apk"
-          APK_TARGET_PATH="$RELEASE_TMP_DIR/$APK_FILENAME"
-          
-          # Copy single APK preserving format
-          cp "$ORIGINAL_APK" "$APK_TARGET_PATH"
-          
-          if [ ! -s "$APK_TARGET_PATH" ]; then
-            echo "ERROR: Failed to copy APK to $APK_TARGET_PATH or file is empty."
-            exit 1
-          fi
-          
-          echo "release_asset_path=$APK_TARGET_PATH" >> "$GITHUB_OUTPUT"
-          echo "release_asset_filename=$APK_FILENAME" >> "$GITHUB_OUTPUT"
 
-      - name: Publish APK to GitHub Releases
-        id: publish_release
+          APK_FILENAME="Siya-AI-build-${{ steps.versioning.outputs.version_code }}.apk"
+          FINAL_APK_PATH="$RELEASE_TMP_DIR/$APK_FILENAME"
+          cp "$SRC_APK" "$FINAL_APK_PATH"
+
+          # Calculate SHA-256
+          APK_SHA256=$(sha256sum "$FINAL_APK_PATH" | awk '{print $1}')
+          APK_SIZE_BYTES=$(stat -c%s "$FINAL_APK_PATH" 2>/dev/null || stat -f%z "$FINAL_APK_PATH")
+
+          # Commit message for changelog
+          COMMIT_MSG=$(git log -1 --pretty=format:"%s" | sed 's/"/\\"/g')
+          if [ -z "$COMMIT_MSG" ]; then
+            COMMIT_MSG="Siya AI build ${{ steps.versioning.outputs.version_name }} release"
+          fi
+
+          echo "final_apk_path=$FINAL_APK_PATH" >> "$GITHUB_OUTPUT"
+          echo "apk_filename=$APK_FILENAME" >> "$GITHUB_OUTPUT"
+          echo "apk_sha256=$APK_SHA256" >> "$GITHUB_OUTPUT"
+          echo "apk_size=$APK_SIZE_BYTES" >> "$GITHUB_OUTPUT"
+          echo "changelog=$COMMIT_MSG" >> "$GITHUB_OUTPUT"
+          echo "release_dir=$RELEASE_TMP_DIR" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to Telegram channel via Bot API
+        id: send_telegram
+        continue-on-error: true
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
+        run: |
+          APK_PATH="${{ steps.prepare_assets.outputs.final_apk_path }}"
+          APK_NAME="${{ steps.prepare_assets.outputs.apk_filename }}"
+          APK_SIZE="${{ steps.prepare_assets.outputs.apk_size }}"
+          V_CODE="${{ steps.versioning.outputs.version_code }}"
+          V_NAME="${{ steps.versioning.outputs.version_name }}"
+          CHANGELOG="${{ steps.prepare_assets.outputs.changelog }}"
+          REPO_URL="https://github.com/${{ github.repository }}"
+
+          if [ -z "$TG_BOT_TOKEN" ] || [ -z "$TG_CHAT_ID" ]; then
+            echo "Telegram credentials (TG_BOT_TOKEN, TG_CHAT_ID) not configured. Skipping Telegram broadcast."
+            echo "telegram_post_url=https://t.me/alphabit_s" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Telegram 50MB file size limit for bot API (52,428,800 bytes)
+          MAX_TG_SIZE=52428800
+          TELEGRAM_POST_URL=""
+
+          if [ "$APK_SIZE" -le "$MAX_TG_SIZE" ]; then
+            echo "Sending APK document to Telegram channel ($APK_SIZE bytes)..."
+            CAPTION="🚀 <b>Siya AI v${V_NAME} (Build ${V_CODE})</b>%0A%0A📝 <i>${CHANGELOG}</i>%0A%0A🔗 <a href='${REPO_URL}/releases'>GitHub Releases</a>"
+            RESPONSE=$(curl -s -S -F "chat_id=${TG_CHAT_ID}" \
+              -F "document=@${APK_PATH}" \
+              -F "caption=${CAPTION}" \
+              -F "parse_mode=HTML" \
+              "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendDocument")
+          else
+            echo "APK size ($APK_SIZE bytes) exceeds 50MB. Posting link-only announcement to Telegram..."
+            TEXT="🚀 <b>Siya AI v${V_NAME} (Build ${V_CODE})</b>%0A%0A📝 <i>${CHANGELOG}</i>%0A%0A📦 <i>File size exceeds 50MB Telegram bot limit.</i>%0A⬇️ <a href='${REPO_URL}/releases/latest'>Download APK directly from GitHub</a>"
+            RESPONSE=$(curl -s -S -d "chat_id=${TG_CHAT_ID}" \
+              -d "text=${TEXT}" \
+              -d "parse_mode=HTML" \
+              "https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage")
+          fi
+
+          echo "Telegram Bot API Response: $RESPONSE"
+
+          # Extract message link if channel username or message_id available
+          MSG_ID=$(echo "$RESPONSE" | grep -o '"message_id":[0-9]*' | head -1 | cut -d':' -f2)
+          CHAT_USERNAME=$(echo "$RESPONSE" | grep -o '"username":"[^"]*' | head -1 | cut -d'"' -f4)
+
+          if [ -n "$CHAT_USERNAME" ] && [ -n "$MSG_ID" ]; then
+            TELEGRAM_POST_URL="https://t.me/${CHAT_USERNAME}/${MSG_ID}"
+          elif [ -n "$MSG_ID" ]; then
+            # Clean channel ID without -100 prefix for web link
+            CLEAN_CHAT_ID=$(echo "$TG_CHAT_ID" | sed 's/^-100//; s/^-//; s/^@//')
+            TELEGRAM_POST_URL="https://t.me/c/${CLEAN_CHAT_ID}/${MSG_ID}"
+          else
+            TELEGRAM_POST_URL="https://t.me/alphabit_s"
+          fi
+
+          echo "telegram_post_url=$TELEGRAM_POST_URL" >> "$GITHUB_OUTPUT"
+          echo "Telegram Post URL: $TELEGRAM_POST_URL"
+
+      - name: Generate update.json
+        id: generate_json
+        run: |
+          RELEASE_DIR="${{ steps.prepare_assets.outputs.release_dir }}"
+          V_CODE="${{ steps.versioning.outputs.version_code }}"
+          V_NAME="${{ steps.versioning.outputs.version_name }}"
+          CHANGELOG="${{ steps.prepare_assets.outputs.changelog }}"
+          APK_NAME="${{ steps.prepare_assets.outputs.apk_filename }}"
+          SHA256="${{ steps.prepare_assets.outputs.apk_sha256 }}"
+          TG_URL="${{ steps.send_telegram.outputs.telegram_post_url || 'https://t.me/alphabit_s' }}"
+          RELEASE_TAG="v${V_NAME}"
+          APK_DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/${RELEASE_TAG}/${APK_NAME}"
+          PUBLISHED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+          UPDATE_JSON_FILE="$RELEASE_DIR/update.json"
+
+          cat <<EOF > "$UPDATE_JSON_FILE"
+          {
+            "versionCode": $V_CODE,
+            "versionName": "$V_NAME",
+            "changelog": "$CHANGELOG",
+            "apkUrl": "$APK_DOWNLOAD_URL",
+            "apkSha256": "$SHA256",
+            "telegramUrl": "$TG_URL",
+            "mandatory": false,
+            "publishedAt": "$PUBLISHED_AT"
+          }
+          EOF
+
+          echo "update_json_path=$UPDATE_JSON_FILE" >> "$GITHUB_OUTPUT"
+          echo "Generated update.json successfully:"
+          cat "$UPDATE_JSON_FILE"
+
+      - name: Publish Release to GitHub Releases
+        id: publish_github_release
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Confirm GitHub CLI availability
-          gh --version
-          
-          APK_PATH="${{ steps.prepare_asset.outputs.release_asset_path }}"
-          APK_NAME="${{ steps.prepare_asset.outputs.release_asset_filename }}"
-          
-          # Confirm APK asset exists
-          if [ -z "$APK_PATH" ] || [ ! -f "$APK_PATH" ]; then
-            echo "ERROR: Release APK asset not found at: $APK_PATH"
-            exit 1
-          fi
-          
-          # Confirm APK is a regular, non-empty .apk file
-          if [ ! -s "$APK_PATH" ]; then
-            echo "ERROR: Release APK asset is empty: $APK_PATH"
-            exit 1
-          fi
-          
-          case "$APK_PATH" in
-            *.apk) ;;
-            *)
-              echo "ERROR: Release asset $APK_PATH is not an .apk file."
-              exit 1
-              ;;
-          esac
-          
-          RELEASE_TAG="debug-apk-build-${{ github.run_number }}-${{ github.run_attempt }}"
-          RELEASE_TITLE="Siya AI"
-          
-          echo "Publishing GitHub Release with title '$RELEASE_TITLE' and single APK asset $APK_NAME..."
-          
+          APK_PATH="${{ steps.prepare_assets.outputs.final_apk_path }}"
+          UPDATE_JSON="${{ steps.generate_json.outputs.update_json_path }}"
+          V_NAME="${{ steps.versioning.outputs.version_name }}"
+          V_CODE="${{ steps.versioning.outputs.version_code }}"
+          RELEASE_TAG="v${V_NAME}"
+          RELEASE_TITLE="Siya AI v${V_NAME}"
+          CHANGELOG="${{ steps.prepare_assets.outputs.changelog }}"
+
+          echo "Publishing release $RELEASE_TAG with APK and update.json..."
+
           gh release create "$RELEASE_TAG" \
             "$APK_PATH" \
+            "$UPDATE_JSON" \
             --title "$RELEASE_TITLE" \
-            --notes "" \
+            --notes "$CHANGELOG" \
             --target "${{ github.sha }}" \
             --latest
-          
-          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
-          echo "release_title=$RELEASE_TITLE" >> "$GITHUB_OUTPUT"
 
-      - name: Report APK download result
-        if: always()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          PUBLISH_OUTCOME="${{ steps.publish_release.outcome }}"
-          RELEASE_TAG="debug-apk-build-${{ github.run_number }}-${{ github.run_attempt }}"
-          RELEASE_TITLE="Siya AI"
-          APK_NAME="${{ steps.prepare_asset.outputs.release_asset_filename }}"
-          
-          if [ "$PUBLISH_OUTCOME" = "success" ]; then
-            echo "Confirming release with gh release view..."
-            gh release view "$RELEASE_TAG" || true
-            
-            RELEASE_URL=$(gh release view "$RELEASE_TAG" --json url -q .url 2>/dev/null || echo "https://github.com/${{ github.repository }}/releases/tag/$RELEASE_TAG")
-            
-            echo "========================================================"
-            echo "GITHUB RELEASE PUBLISHED SUCCESSFULLY"
-            echo "Release Title: $RELEASE_TITLE"
-            echo "Release Tag: $RELEASE_TAG"
-            echo "Direct Release URL: $RELEASE_URL"
-            echo "Single APK Asset: $APK_NAME"
-            echo "========================================================"
-            
-            cat <<EOF >> "$GITHUB_STEP_SUMMARY"
-            ## :white_check_mark: Siya AI Release Published Successfully!
-            
-            - **Release Title**: $RELEASE_TITLE
-            - **Release Tag**: \`$RELEASE_TAG\`
-            - **Download APK**: [$APK_NAME]($RELEASE_URL)
-            - **Release Page**: [$RELEASE_URL]($RELEASE_URL)
-            
-            The single APK file is directly downloadable from the **Assets** section of the release page.
-            
-            *Backup*: The standard Actions artifact named \`app-debug-apk\` is also available in this workflow run.
-            EOF
-          else
-            echo "::warning ::Release publishing failed or was not completed, but the debug APK build succeeded."
-            echo "The Actions artifact named app-debug-apk remains available for download."
-            
-            cat <<EOF >> "$GITHUB_STEP_SUMMARY"
-            ## :warning: Debug APK Build Succeeded (Release Publishing Failed)
-            
-            - **APK Build Status**: Succeeded
-            - **Actions Artifact**: \`app-debug-apk\` (available for download in this workflow run summary)
-            - **Notice**: Release publishing could not be completed with the current token permissions. The APK artifact remains preserved and downloadable from this run's summary.
-            EOF
-          fi
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: siya-ai-release-v${{ steps.versioning.outputs.version_name }}
+          path: |
+            ${{ steps.prepare_assets.outputs.final_apk_path }}
+            ${{ steps.generate_json.outputs.update_json_path }}
+          if-no-files-found: error

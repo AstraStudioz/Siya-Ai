@@ -210,12 +210,64 @@ class MainActivity : AppCompatActivity() {
         })
 
         handleWidgetIntent(intent)
+        handleUpdateIntent(intent)
+        observeAppUpdates()
+        checkUpdatesOnLaunch()
     }
+
+    private var hasShownUpdatePopupThisSession = false
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         handleWidgetIntent(intent)
+        handleUpdateIntent(intent)
+    }
+
+    private fun handleUpdateIntent(intent: Intent?) {
+        if (intent == null) return
+        val openUpdates = intent.getBooleanExtra(com.jarvis.assistant.update.UpdateManager.EXTRA_OPEN_UPDATES_TAB, false)
+        val showPopup = intent.getBooleanExtra(com.jarvis.assistant.update.UpdateManager.EXTRA_SHOW_UPDATE_POPUP, false)
+        if (openUpdates) {
+            selectTab(TAB_UPDATES)
+        }
+        if (showPopup) {
+            val cached = com.jarvis.assistant.JarvisApp.instance.preferences.getCachedUpdateInfo()
+            if (cached != null && cached.versionCode > com.jarvis.assistant.BuildConfig.VERSION_CODE) {
+                binding.root.post {
+                    com.jarvis.assistant.update.UpdateDialogHelper.showUpdatePopup(this, cached)
+                }
+            }
+        }
+    }
+
+    private fun observeAppUpdates() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(androidx.lifecycle.Lifecycle.State.STARTED) {
+                com.jarvis.assistant.update.UpdateManager.availableUpdateFlow.collect { updateInfo ->
+                    val info = updateInfo ?: com.jarvis.assistant.JarvisApp.instance.preferences.getCachedUpdateInfo()
+                    val hasUpdate = info != null && info.versionCode > com.jarvis.assistant.BuildConfig.VERSION_CODE
+                    val isSkipped = info != null && com.jarvis.assistant.JarvisApp.instance.preferences.isVersionSkipped(info.versionCode)
+
+                    binding.badgeUpdates.visibility = if (hasUpdate && !isSkipped) View.VISIBLE else View.GONE
+
+                    if (hasUpdate && info != null && !hasShownUpdatePopupThisSession && (!isSkipped || info.mandatory)) {
+                        hasShownUpdatePopupThisSession = true
+                        binding.root.post {
+                            com.jarvis.assistant.update.UpdateDialogHelper.showUpdatePopup(this@MainActivity, info)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkUpdatesOnLaunch() {
+        if (com.jarvis.assistant.JarvisApp.instance.preferences.isUpdateAutoCheckEnabled) {
+            lifecycleScope.launch {
+                com.jarvis.assistant.update.UpdateManager.checkForUpdate(isManual = false)
+            }
+        }
     }
 
     private fun handleWidgetIntent(intent: Intent?) {

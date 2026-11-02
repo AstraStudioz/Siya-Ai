@@ -1,5 +1,19 @@
 # Siya AI - Release Notes & Changelog
 
+## Phase 3: Gemini Multimodal Live Streaming & Camera Vision Hardening
+- **Gemini Live Multimodal Video Chunk Payload (`network/GeminiLiveWebSocket.kt:1066-1068`)**:
+  - **Root Cause**: `sendMediaChunk` formatted outbound video frames as `{"realtimeInput":{"video":{"mimeType":"image/jpeg","data":"..."}}}`, which violates the Gemini Multimodal Live API specification. The server requires `mediaChunks` array (`{"realtimeInput":{"mediaChunks":[{"mimeType":"image/jpeg","data":"..."}]}}`), causing all camera and screen sharing frames to be discarded.
+  - **Fix**: Replaced invalid `"video"` object wrapper with standard `"mediaChunks"` array containing `image/jpeg` payload.
+  - Added `buildMediaChunkJson` and `buildAudioChunkJson` companion methods for deterministic payload serialization and JVM unit testing.
+- **WebSocket Setup Transcription Synchronization (`network/GeminiLiveWebSocket.kt:294-295`)**:
+  - Mirrored `inputAudioTranscription` and `outputAudioTranscription` inside `generation_config` in the WebSocket setup message, guaranteeing compatibility across all Gemini 3.8 and 3.1 Live preview model endpoints.
+- **Camera Vision UI & Audio Synchronization (`ui/camera/CameraVisionActivity.kt:218, 502-506`)**:
+  - Ensured `ensureAudioCapture()` executes automatically when unmuting or starting session in Camera Vision mode.
+  - Dynamically bound `imageTintList` on `btnMicToggle` using `?attr/themeAccent` (unmuted) and `?attr/themeTextMuted` (muted) to match the visual system.
+- **Unit Testing**:
+  - Added `testMediaChunkJsonFormatCompliesWithMultimodalLiveApi` and `testAudioChunkJsonFormatCompliesWithMultimodalLiveApi` to `GeminiLiveSessionTest.kt`.
+  - 135 unit tests passing (`gradle :app:testDebugUnitTest`).
+
 ## Phase 4: Persistence Hardening & CameraX 1.5 Modernization
 - **Room Persistence Hardening (`data/memory/MemoryDatabase.kt`)**:
   - Enabled schema export (`exportSchema = true`) to prevent accidental schema divergence.

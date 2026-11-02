@@ -138,6 +138,12 @@ class SettingsFragment : Fragment() {
         }
 
         binding.tvMicSensitivitySubtitle.text = "Sensitivity: ${preferences.micSensitivity.replaceFirstChar { it.uppercase() }} • Level meter & VAD test"
+
+        // Updates
+        binding.tvAppCurrentVersion.text = "Installed: v${com.jarvis.assistant.BuildConfig.VERSION_NAME} (Build ${com.jarvis.assistant.BuildConfig.VERSION_CODE})"
+        binding.switchAutoCheckUpdates.isChecked = preferences.isUpdateAutoCheckEnabled
+        binding.switchUpdateNotifications.isChecked = preferences.isUpdateNotificationsEnabled
+        binding.switchWifiOnlyDownload.isChecked = preferences.isUpdateWifiOnly
     }
 
     private fun setupClickListeners() {
@@ -157,6 +163,41 @@ class SettingsFragment : Fragment() {
             val msg = if (isChecked) "Auto-switch chat mode Enabled" else "Auto-switch chat mode Disabled"
             Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
         }
+
+        // Updates Toggles & Actions
+        binding.switchAutoCheckUpdates.setOnCheckedChangeListener { _, isChecked ->
+            preferences.isUpdateAutoCheckEnabled = isChecked
+        }
+        binding.switchUpdateNotifications.setOnCheckedChangeListener { _, isChecked ->
+            preferences.isUpdateNotificationsEnabled = isChecked
+        }
+        binding.switchWifiOnlyDownload.setOnCheckedChangeListener { _, isChecked ->
+            preferences.isUpdateWifiOnly = isChecked
+        }
+
+        val checkUpdateAction = {
+            binding.pbCheckingUpdates.visibility = View.VISIBLE
+            binding.btnCheckUpdatesNow.isEnabled = false
+            viewLifecycleOwner.lifecycleScope.launch {
+                val result = com.jarvis.assistant.update.UpdateManager.checkForUpdate(isManual = true)
+                binding.pbCheckingUpdates.visibility = View.GONE
+                binding.btnCheckUpdatesNow.isEnabled = true
+                when (result) {
+                    is com.jarvis.assistant.data.update.UpdateCheckResult.UpdateAvailable -> {
+                        com.jarvis.assistant.update.UpdateDialogHelper.showUpdatePopup(requireActivity(), result.updateInfo)
+                    }
+                    is com.jarvis.assistant.data.update.UpdateCheckResult.UpToDate -> {
+                        Toast.makeText(requireContext(), "You're up to date! Siya AI v${com.jarvis.assistant.BuildConfig.VERSION_NAME} is the latest version.", Toast.LENGTH_SHORT).show()
+                    }
+                    is com.jarvis.assistant.data.update.UpdateCheckResult.Error -> {
+                        Toast.makeText(requireContext(), result.message, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        binding.btnCheckUpdatesNow.setOnClickListener { checkUpdateAction() }
+        binding.rowCheckForUpdates.setOnClickListener { checkUpdateAction() }
 
         // Section 1: AI & Voice Intelligence
         binding.rowOwnerVoice.setOnClickListener {
@@ -215,14 +256,18 @@ class SettingsFragment : Fragment() {
             startActivity(Intent(requireContext(), PrivacyShieldActivity::class.java))
         }
 
-        // Community: official Telegram channel
-        binding.btnSocialTelegram.setOnClickListener {
-            openUrl(BrandConfig.TELEGRAM_CHANNEL_URL)
+        // Official Links: Website & YouTube
+        binding.btnOfficialWebsite.setOnClickListener {
+            openUrl(BrandConfig.OFFICIAL_WEBSITE_URL)
         }
 
-        // Developer attribution footer opens the official channel
+        binding.btnOfficialYoutube.setOnClickListener {
+            openUrl(BrandConfig.OFFICIAL_YOUTUBE_URL)
+        }
+
+        // Attribution footer opens the official website
         binding.tvFooterCredit.setOnClickListener {
-            openUrl(BrandConfig.TELEGRAM_CHANNEL_URL)
+            openUrl(BrandConfig.OFFICIAL_WEBSITE_URL)
         }
     }
 

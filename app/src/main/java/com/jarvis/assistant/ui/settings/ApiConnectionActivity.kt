@@ -79,27 +79,6 @@ class ApiConnectionActivity : AppCompatActivity() {
         if (preferences.customEndpoint.isNotBlank()) {
             binding.tvEndpointSummary.text = "Active Endpoint: ${preferences.customEndpoint}"
         }
-
-        // Image Providers & Credentials
-        binding.etCloudflareAccountId.setText(preferences.cloudflareAccountId)
-        binding.etCloudflareApiToken.setText(preferences.cloudflareApiToken)
-        binding.etHuggingFaceApiToken.setText(preferences.huggingFaceApiToken)
-        binding.etPollinationsApiKey.setText(preferences.pollinationsApiKey)
-
-        when (preferences.imageProvider) {
-            com.jarvis.assistant.network.ImageGenClient.PROVIDER_GEMINI -> binding.rbImageProviderGemini.isChecked = true
-            com.jarvis.assistant.network.ImageGenClient.PROVIDER_CLOUDFLARE -> binding.rbImageProviderCloudflare.isChecked = true
-            com.jarvis.assistant.network.ImageGenClient.PROVIDER_HUGGINGFACE -> binding.rbImageProviderHuggingFace.isChecked = true
-            com.jarvis.assistant.network.ImageGenClient.PROVIDER_POLLINATIONS -> binding.rbImageProviderPollinations.isChecked = true
-            else -> binding.rbImageProviderAuto.isChecked = true
-        }
-
-        // Visual Search & Stock Photos Credentials
-        binding.etUnsplashAccessKey.setText(preferences.unsplashAccessKey)
-        binding.etPexelsApiKey.setText(preferences.pexelsApiKey)
-        binding.etPixabayApiKey.setText(preferences.pixabayApiKey)
-        binding.etGooglePseApiKey.setText(preferences.googlePseApiKey)
-        binding.etGooglePseCx.setText(preferences.googlePseCx)
     }
 
     private fun setupListeners() {
@@ -138,38 +117,19 @@ class ApiConnectionActivity : AppCompatActivity() {
         }
 
         binding.btnTestImageGeneration.setOnClickListener {
-            val cfAcc = binding.etCloudflareAccountId.text?.toString()?.trim() ?: ""
-            val cfToken = binding.etCloudflareApiToken.text?.toString()?.trim() ?: ""
-            val hfToken = binding.etHuggingFaceApiToken.text?.toString()?.trim() ?: ""
-            val polKey = binding.etPollinationsApiKey.text?.toString()?.trim() ?: ""
-            val geminiKey = binding.etApiKey.text?.toString()?.trim() ?: ""
-
-            preferences.cloudflareAccountId = cfAcc
-            preferences.cloudflareApiToken = cfToken
-            preferences.huggingFaceApiToken = hfToken
-            preferences.pollinationsApiKey = polKey
-            if (geminiKey.isNotBlank()) preferences.apiKey = geminiKey
-
-            val selectedProvider = when (binding.rgImageProviderGroup.checkedRadioButtonId) {
-                binding.rbImageProviderGemini.id -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_GEMINI
-                binding.rbImageProviderCloudflare.id -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_CLOUDFLARE
-                binding.rbImageProviderHuggingFace.id -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_HUGGINGFACE
-                binding.rbImageProviderPollinations.id -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_POLLINATIONS
-                else -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_AUTO
-            }
+            val geminiKey = binding.etApiKey.text?.toString()?.trim() ?: preferences.apiKey
 
             binding.btnTestImageGeneration.isEnabled = false
             binding.tvImageTestResult.visibility = View.VISIBLE
             binding.tvImageTestResult.setTextColor(Color.parseColor("#3B82F6"))
-            binding.tvImageTestResult.text = "Testing image generation with provider ($selectedProvider)..."
+            binding.tvImageTestResult.text = "Testing key-free image generation chain (Gemini -> Pollinations -> AI Horde)..."
 
             lifecycleScope.launch(Dispatchers.IO) {
                 val client = com.jarvis.assistant.network.ImageGenClient()
                 val result = client.generateImage(
                     context = applicationContext,
                     apiKey = geminiKey,
-                    prompt = "A serene mountain lake at sunrise, highly detailed",
-                    preferredProvider = selectedProvider
+                    prompt = "A serene mountain lake at sunrise, highly detailed"
                 )
                 withContext(Dispatchers.Main) {
                     binding.btnTestImageGeneration.isEnabled = true
@@ -441,34 +401,14 @@ class ApiConnectionActivity : AppCompatActivity() {
             else -> GeminiConstants.MODEL_3_1_FLASH
         }
 
-        val selectedImageProvider = when (binding.rgImageProviderGroup.checkedRadioButtonId) {
-            binding.rbImageProviderGemini.id -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_GEMINI
-            binding.rbImageProviderCloudflare.id -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_CLOUDFLARE
-            binding.rbImageProviderHuggingFace.id -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_HUGGINGFACE
-            binding.rbImageProviderPollinations.id -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_POLLINATIONS
-            else -> com.jarvis.assistant.network.ImageGenClient.PROVIDER_AUTO
-        }
-
         preferences.apiKey = key
         preferences.aiModel = selectedModel
         preferences.customEndpoint = customEp
 
-        preferences.imageProvider = selectedImageProvider
-        preferences.cloudflareAccountId = binding.etCloudflareAccountId.text?.toString()?.trim() ?: ""
-        preferences.cloudflareApiToken = binding.etCloudflareApiToken.text?.toString()?.trim() ?: ""
-        preferences.huggingFaceApiToken = binding.etHuggingFaceApiToken.text?.toString()?.trim() ?: ""
-        preferences.pollinationsApiKey = binding.etPollinationsApiKey.text?.toString()?.trim() ?: ""
-
-        preferences.unsplashAccessKey = binding.etUnsplashAccessKey.text?.toString()?.trim() ?: ""
-        preferences.pexelsApiKey = binding.etPexelsApiKey.text?.toString()?.trim() ?: ""
-        preferences.pixabayApiKey = binding.etPixabayApiKey.text?.toString()?.trim() ?: ""
-        preferences.googlePseApiKey = binding.etGooglePseApiKey.text?.toString()?.trim() ?: ""
-        preferences.googlePseCx = binding.etGooglePseCx.text?.toString()?.trim() ?: ""
-
         com.jarvis.assistant.background.JarvisConversationService.clearLiveError()
         com.jarvis.assistant.background.JarvisConversationService.restartSession()
 
-        Toast.makeText(this, "API & Provider settings saved!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "API settings saved!", Toast.LENGTH_SHORT).show()
         finish()
     }
 

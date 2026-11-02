@@ -1,23 +1,26 @@
 package com.jarvis.assistant.ui.settings
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.webkit.JavascriptInterface
-import android.webkit.WebView
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
-import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
+import android.webkit.WebView
 import android.widget.RadioGroup
 import android.widget.Spinner
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 import androidx.webkit.WebViewAssetLoader
 import androidx.webkit.WebViewClientCompat
 import com.jarvis.assistant.JarvisApp
 import com.jarvis.assistant.R
+import com.jarvis.assistant.util.BrandConfig
 import com.jarvis.assistant.util.ThemeManager
 
 class OverlayAvatarActivity : AppCompatActivity() {
-    private lateinit var avatarGallery: WebView
+    private lateinit var avatarPreview: WebView
     private lateinit var overlaySwitch: SwitchCompat
     private val preferences get() = JarvisApp.instance.preferences
     private lateinit var assetLoader: WebViewAssetLoader
@@ -27,6 +30,9 @@ class OverlayAvatarActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_overlay_avatar)
         ThemeManager.applyDynamicBackground(findViewById(R.id.overlayAvatarRoot))
+
+        // Ensure avatar is strictly Siya
+        preferences.taskOverlayAvatar = "siya"
 
         findViewById<android.view.View>(R.id.btnBack).setOnClickListener { finish() }
         overlaySwitch = findViewById(R.id.switchOverlayEnabled)
@@ -59,66 +65,37 @@ class OverlayAvatarActivity : AppCompatActivity() {
             edgeSpinner.isEnabled = enabled
             for (i in 0 until modeGroup.childCount) modeGroup.getChildAt(i).isEnabled = enabled
         }
-        avatarGallery = findViewById(R.id.avatarGallery)
+
+        findViewById<TextView>(R.id.tvUnifiedFooter)?.setOnClickListener {
+            try {
+                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(BrandConfig.OFFICIAL_WEBSITE_URL)))
+            } catch (_: Exception) {}
+        }
+
+        avatarPreview = findViewById(R.id.avatarPreview)
         assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
             .build()
-        setupGallery()
+        setupPreview()
     }
 
-    @SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
-    private fun setupGallery() {
-        avatarGallery.setBackgroundColor(android.graphics.Color.TRANSPARENT)
-        avatarGallery.settings.javaScriptEnabled = true
-        avatarGallery.settings.domStorageEnabled = true
-        avatarGallery.settings.allowFileAccess = false
-        avatarGallery.addJavascriptInterface(AvatarPickerBridge(), "JarvisAvatarPicker")
-        avatarGallery.webViewClient = object : WebViewClientCompat() {
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun setupPreview() {
+        avatarPreview.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        avatarPreview.settings.javaScriptEnabled = true
+        avatarPreview.settings.domStorageEnabled = true
+        avatarPreview.settings.allowFileAccess = false
+        avatarPreview.webViewClient = object : WebViewClientCompat() {
             override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? =
                 assetLoader.shouldInterceptRequest(request.url)
-
-            override fun onPageFinished(view: WebView?, url: String?) {
-                super.onPageFinished(view, url)
-                selectInGallery(preferences.taskOverlayAvatar)
-                avatarGallery.evaluateJavascript(
-                    "window.setGalleryTheme && window.setGalleryTheme('#${themeColor(R.attr.themeTextPrimary)}', '#${themeColor(R.attr.themeAccent)}')",
-                    null
-                )
-            }
         }
-        avatarGallery.loadUrl("https://appassets.androidplatform.net/assets/overlay-toys/gallery.html")
-    }
-
-    private fun selectInGallery(name: String) {
-        avatarGallery.evaluateJavascript("window.setSelectedAvatar && window.setSelectedAvatar('$name')", null)
-    }
-
-    private fun themeColor(attribute: Int): String {
-        val value = android.util.TypedValue()
-        theme.resolveAttribute(attribute, value, true)
-        return String.format(java.util.Locale.US, "%06X", 0xFFFFFF and value.data)
-    }
-
-    private inner class AvatarPickerBridge {
-        @JavascriptInterface
-        fun pageReady() {
-            runOnUiThread { selectInGallery(preferences.taskOverlayAvatar) }
-        }
-
-        @JavascriptInterface
-        fun selectAvatar(name: String) {
-            runOnUiThread {
-                preferences.taskOverlayAvatar = name
-                selectInGallery(preferences.taskOverlayAvatar)
-            }
-        }
+        avatarPreview.loadUrl("https://appassets.androidplatform.net/assets/overlay-toys/siya.html")
     }
 
     override fun onDestroy() {
-        if (::avatarGallery.isInitialized) {
-            avatarGallery.removeJavascriptInterface("JarvisAvatarPicker")
-            avatarGallery.stopLoading()
-            avatarGallery.destroy()
+        if (::avatarPreview.isInitialized) {
+            avatarPreview.stopLoading()
+            avatarPreview.destroy()
         }
         super.onDestroy()
     }

@@ -74,9 +74,8 @@ class ImageGenClientTest {
     fun testProviderConstants() {
         assertEquals("auto", ImageGenClient.PROVIDER_AUTO)
         assertEquals("gemini", ImageGenClient.PROVIDER_GEMINI)
-        assertEquals("cloudflare", ImageGenClient.PROVIDER_CLOUDFLARE)
-        assertEquals("huggingface", ImageGenClient.PROVIDER_HUGGINGFACE)
         assertEquals("pollinations", ImageGenClient.PROVIDER_POLLINATIONS)
+        assertEquals("ai_horde", ImageGenClient.PROVIDER_AI_HORDE)
     }
 
     @Test
@@ -95,7 +94,7 @@ class ImageGenClientTest {
             prompt = "A glowing neon cyberpunk cat",
             aspectRatio = "16:9",
             stylePreset = "Anime",
-            apiKey = "test_pol_key",
+            apiKey = "",
             seed = 9999L
         )
         assertNotNull(url)
@@ -104,26 +103,29 @@ class ImageGenClientTest {
         assertTrue(url.contains("height=720"))
         assertTrue(url.contains("nologo=true"))
         assertTrue(url.contains("seed=9999"))
-        assertTrue(url.contains("key=test_pol_key"))
         assertTrue(url.contains("anime%20aesthetic"))
     }
 
     @Test
-    fun testCloudflarePayload() {
-        val jsonStr = ImageGenClient.buildCloudflarePayloadJson("Futuristic skyline", "Cinematic")
-        assertNotNull(jsonStr)
-        val json = JsonParser.parseString(jsonStr).asJsonObject
-        assertTrue(json.get("prompt").asString.contains("Futuristic skyline"))
-        assertTrue(json.get("prompt").asString.contains("cinematic atmosphere"))
-        assertEquals(4, json.get("num_steps").asInt)
+    fun testQuotaOrPlanErrorDetection() {
+        assertTrue(ImageGenClient.isQuotaOrPlanError("RESOURCE_EXHAUSTED: Quota exceeded for project"))
+        assertTrue(ImageGenClient.isQuotaOrPlanError("HTTP 429: Rate limit exceeded"))
+        assertTrue(ImageGenClient.isQuotaOrPlanError("PermissionDenied: The caller does not have permission"))
+        assertTrue(ImageGenClient.isQuotaOrPlanError("Imagen 3 is only available for paid tier accounts"))
+        assertTrue(ImageGenClient.isQuotaOrPlanError("billing not enabled"))
+        assertFalse(ImageGenClient.isQuotaOrPlanError("Network connection reset"))
+        assertFalse(ImageGenClient.isQuotaOrPlanError("SocketTimeoutException"))
     }
 
     @Test
-    fun testHuggingFacePayload() {
-        val jsonStr = ImageGenClient.buildHuggingFacePayloadJson("Ancient temple ruins", "Photo")
-        assertNotNull(jsonStr)
-        val json = JsonParser.parseString(jsonStr).asJsonObject
-        assertTrue(json.get("inputs").asString.contains("Ancient temple ruins"))
-        assertTrue(json.get("inputs").asString.contains("photorealistic"))
+    fun testAiHordePayloadBuilder() {
+        val payload = ImageGenClient.buildAiHordePayloadJson("Futuristic skyline", 1024, 1024)
+        assertNotNull(payload)
+        val json = JsonParser.parseString(payload).asJsonObject
+        assertEquals("Futuristic skyline", json.get("prompt").asString)
+        val params = json.getAsJsonObject("params")
+        assertEquals(1024, params.get("width").asInt)
+        assertEquals(1024, params.get("height").asInt)
+        assertEquals(1, params.get("n").asInt)
     }
 }

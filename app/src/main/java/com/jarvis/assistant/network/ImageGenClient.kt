@@ -98,9 +98,8 @@ class ImageGenClient(
 
         const val PROVIDER_AUTO = "auto"
         const val PROVIDER_GEMINI = "gemini"
-        const val PROVIDER_CLOUDFLARE = "cloudflare"
-        const val PROVIDER_HUGGINGFACE = "huggingface"
         const val PROVIDER_POLLINATIONS = "pollinations"
+        const val PROVIDER_AI_HORDE = "ai_horde"
 
         fun getDimensionsForAspectRatio(aspectRatio: String): Pair<Int, Int> {
             return when (aspectRatio) {
@@ -139,21 +138,13 @@ class ImageGenClient(
             }
         }
 
-        fun buildCloudflarePayloadJson(prompt: String, stylePreset: String = "None"): String {
-            val effectivePrompt = applyStylePreset(prompt, stylePreset)
-            val map = mapOf(
-                "prompt" to effectivePrompt,
-                "num_steps" to 4
-            )
-            return com.google.gson.Gson().toJson(map)
-        }
-
-        fun buildHuggingFacePayloadJson(prompt: String, stylePreset: String = "None"): String {
-            val effectivePrompt = applyStylePreset(prompt, stylePreset)
-            val map = mapOf(
-                "inputs" to effectivePrompt
-            )
-            return com.google.gson.Gson().toJson(map)
+        fun isQuotaOrPlanError(reason: String): Boolean {
+            val r = reason.lowercase()
+            return r.contains("429") || r.contains("resource_exhausted") ||
+                   r.contains("quota") || r.contains("billing") || r.contains("plan") ||
+                   r.contains("credit") || r.contains("limit exceeded") ||
+                   r.contains("permissiondenied") || r.contains("permission denied") ||
+                   r.contains("permission") || r.contains("paid tier")
         }
 
         fun buildGeminiImagePayloadJson(prompt: String, stylePreset: String = "None"): String {
@@ -168,6 +159,19 @@ class ImageGenClient(
                 ),
                 "generationConfig" to mapOf(
                     "responseModalities" to listOf("IMAGE")
+                )
+            )
+            return com.google.gson.Gson().toJson(map)
+        }
+
+        fun buildAiHordePayloadJson(prompt: String, width: Int, height: Int): String {
+            val map = mapOf(
+                "prompt" to prompt,
+                "params" to mapOf(
+                    "n" to 1,
+                    "steps" to 20,
+                    "width" to width,
+                    "height" to height
                 )
             )
             return com.google.gson.Gson().toJson(map)
@@ -245,28 +249,15 @@ class ImageGenClient(
 
         val prefs = com.jarvis.assistant.JarvisApp.instance.preferences
         val effectiveApiKey = apiKey.trim().ifBlank { prefs.apiKey.trim() }
-        val providerSetting = if (preferredProvider != "auto") preferredProvider else prefs.imageProvider
-
-        // If specific provider chosen explicitly, execute directly
-        if (providerSetting == PROVIDER_POLLINATIONS) {
-            val polResult = generateWithPollinations(context, trimmedPrompt, stylePreset, aspectRatio, prefs.pollinationsApiKey)
-            if (polResult is ImageGenResult.Success) return@withContext polResult
-        } else if (providerSetting == PROVIDER_CLOUDFLARE) {
-            val cfResult = generateWithCloudflare(context, prefs.cloudflareAccountId, prefs.cloudflareApiToken, trimmedPrompt, stylePreset, aspectRatio)
-            if (cfResult is ImageGenResult.Success) return@withContext cfResult
-        } else if (providerSetting == PROVIDER_HUGGINGFACE) {
-            val hfResult = generateWithHuggingFace(context, prefs.huggingFaceApiToken, trimmedPrompt, stylePreset, aspectRatio)
-            if (hfResult is ImageGenResult.Success) return@withContext hfResult
-        }
 
         var lastFailureReason = "Image generation service unavailable"
 
-        // 1. Try Gemini Imagen 3 / Gemini Flash Image if key is available
-        if (effectiveApiKey.isNotBlank()) {
+        // 1. Try Gemini image models (Imagen 3 / Gemini Flash Image) only if key is configured and not quota-blocked
+        if (effectiveApiKey.isNotBlank() && !prefs.isGeminiImageQuotaBlocked()) {
             val modelsToTry = getOrderedImageModels(effectiveApiKey)
             for (model in modelsToTry) {
                 try {
-                    Log.i(TAG, "Attempting image generation with model: $model")
+                    Log.i(TAG, "Attempting image generation with Gemini model: $model")
                     val result = if (model.contains("imagen", ignoreCase = true)) {
                         generateWithImagen(context, effectiveApiKey, model, trimmedPrompt, aspectRatio, stylePreset, negativePrompt)
                     } else {
@@ -279,46 +270,42 @@ class ImageGenClient(
                             return@withContext result
                         }
                         is ImageGenResult.Failure -> {
-                            Log.w(TAG, "Model $model failed: ${result.reason}. Trying next fallback...")
+                            Log.w(TAG, "Model $model failed: ${result.reason}. Checking quota/plan error...")
                             lastFailureReason = result.reason
+                            if (isQuotaOrPlanError(result.reason)) {
+                                Log.w(TAG, "Gemini image quota or plan error detected: remembering for 24 hours.")
+                                prefs.recordGeminiImageQuotaError()
+                                break
+                            }
                         }
                     }
                 } catch (e: Exception) {
                     Log.w(TAG, "Exception during generation with $model: ${e.message}")
                     lastFailureReason = e.message ?: "Network error"
+                    if (isQuotaOrPlanError(lastFailureReason)) {
+                        prefs.recordGeminiImageQuotaError()
+                        break
+                    }
                 }
             }
         }
 
-        // 2. Try Cloudflare Workers AI FLUX if configured
-        if (prefs.cloudflareAccountId.isNotBlank() && prefs.cloudflareApiToken.isNotBlank()) {
-            Log.i(TAG, "Attempting fallback to Cloudflare Workers AI FLUX...")
-            val cfResult = generateWithCloudflare(context, prefs.cloudflareAccountId, prefs.cloudflareApiToken, trimmedPrompt, stylePreset, aspectRatio)
-            if (cfResult is ImageGenResult.Success) {
-                return@withContext cfResult
-            } else if (cfResult is ImageGenResult.Failure) {
-                lastFailureReason = cfResult.reason
-            }
-        }
-
-        // 3. Try Hugging Face FLUX if configured
-        if (prefs.huggingFaceApiToken.isNotBlank()) {
-            Log.i(TAG, "Attempting fallback to Hugging Face FLUX...")
-            val hfResult = generateWithHuggingFace(context, prefs.huggingFaceApiToken, trimmedPrompt, stylePreset, aspectRatio)
-            if (hfResult is ImageGenResult.Success) {
-                return@withContext hfResult
-            } else if (hfResult is ImageGenResult.Failure) {
-                lastFailureReason = hfResult.reason
-            }
-        }
-
-        // 4. Fallback to Pollinations AI (free, no setup required)
-        Log.i(TAG, "Attempting fallback to Pollinations AI...")
-        val polResult = generateWithPollinations(context, trimmedPrompt, stylePreset, aspectRatio, prefs.pollinationsApiKey)
+        // 2. Key-Free Fallback 1: Pollinations AI (free, zero setup, no key)
+        Log.i(TAG, "Attempting key-free generation with Pollinations AI...")
+        val polResult = generateWithPollinations(context, trimmedPrompt, stylePreset, aspectRatio)
         if (polResult is ImageGenResult.Success) {
             return@withContext polResult
         } else if (polResult is ImageGenResult.Failure) {
             lastFailureReason = polResult.reason
+        }
+
+        // 3. Key-Free Fallback 2: AI Horde (free, anonymous key 0000000000)
+        Log.i(TAG, "Attempting key-free generation with AI Horde...")
+        val hordeResult = generateWithAiHorde(context, trimmedPrompt, stylePreset, aspectRatio)
+        if (hordeResult is ImageGenResult.Success) {
+            return@withContext hordeResult
+        } else if (hordeResult is ImageGenResult.Failure) {
+            lastFailureReason = hordeResult.reason
         }
 
         ImageGenResult.Failure(
@@ -415,105 +402,14 @@ class ImageGenClient(
         }
     }
 
-    fun generateWithCloudflare(
-        context: Context,
-        accountId: String,
-        apiToken: String,
-        prompt: String,
-        stylePreset: String = "None",
-        aspectRatio: String = "1:1"
-    ): ImageGenResult {
-        if (accountId.isBlank() || apiToken.isBlank()) {
-            return ImageGenResult.Failure("Cloudflare credentials not configured.")
-        }
-        val url = "https://api.cloudflare.com/client/v4/accounts/$accountId/ai/run/@cf/black-forest-labs/flux-1-schnell"
-        val payload = buildCloudflarePayloadJson(prompt, stylePreset)
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("Authorization", "Bearer $apiToken")
-            .post(payload.toRequestBody("application/json; charset=utf-8".toMediaType()))
-            .build()
-
-        return try {
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    val err = parseErrorReason(response.code, response.body?.string().orEmpty())
-                    return ImageGenResult.Failure(err)
-                }
-                val body = response.body ?: return ImageGenResult.Failure("Empty response from Cloudflare")
-                val contentType = response.header("Content-Type", "") ?: ""
-                val imageBytes = if (contentType.contains("image")) {
-                    body.bytes()
-                } else {
-                    val str = body.string()
-                    val json = JSONObject(str)
-                    val resultObj = json.optJSONObject("result")
-                    val b64 = resultObj?.optString("image", "") ?: ""
-                    if (b64.isNotBlank()) Base64.decode(b64, Base64.DEFAULT) else return ImageGenResult.Failure("No image returned from Cloudflare")
-                }
-                val savedFile = saveDecodedImage(context, imageBytes)
-                if (savedFile != null) {
-                    ImageGenResult.Success(savedFile, "cloudflare-flux-schnell")
-                } else {
-                    ImageGenResult.Failure("Could not save image to device storage")
-                }
-            }
-        } catch (e: Exception) {
-            ImageGenResult.Failure("Cloudflare request failed: ${e.message}")
-        }
-    }
-
-    fun generateWithHuggingFace(
-        context: Context,
-        apiToken: String,
-        prompt: String,
-        stylePreset: String = "None",
-        aspectRatio: String = "1:1"
-    ): ImageGenResult {
-        if (apiToken.isBlank()) {
-            return ImageGenResult.Failure("Hugging Face API token not configured.")
-        }
-        val url = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-schnell"
-        val payload = buildHuggingFacePayloadJson(prompt, stylePreset)
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("Authorization", "Bearer $apiToken")
-            .post(payload.toRequestBody("application/json; charset=utf-8".toMediaType()))
-            .build()
-
-        return try {
-            client.newCall(request).execute().use { response ->
-                if (!response.isSuccessful) {
-                    val err = parseErrorReason(response.code, response.body?.string().orEmpty())
-                    return ImageGenResult.Failure(err)
-                }
-                val body = response.body ?: return ImageGenResult.Failure("Empty response from Hugging Face")
-                val imageBytes = body.bytes()
-                if (imageBytes.isNotEmpty()) {
-                    val savedFile = saveDecodedImage(context, imageBytes)
-                    if (savedFile != null) {
-                        ImageGenResult.Success(savedFile, "huggingface-flux-schnell")
-                    } else {
-                        ImageGenResult.Failure("Could not save image to device storage")
-                    }
-                } else {
-                    ImageGenResult.Failure("Empty image bytes received from Hugging Face")
-                }
-            }
-        } catch (e: Exception) {
-            ImageGenResult.Failure("Hugging Face request failed: ${e.message}")
-        }
-    }
-
     fun generateWithPollinations(
         context: Context,
         prompt: String,
         stylePreset: String = "None",
-        aspectRatio: String = "1:1",
-        apiKey: String = ""
+        aspectRatio: String = "1:1"
     ): ImageGenResult {
         val seed = (System.currentTimeMillis() % 1000000L)
-        val url = buildPollinationsUrl(prompt, aspectRatio, stylePreset, apiKey, seed)
+        val url = buildPollinationsUrl(prompt, aspectRatio, stylePreset, "", seed)
         val request = Request.Builder()
             .url(url)
             .get()
@@ -542,114 +438,90 @@ class ImageGenClient(
         }
     }
 
-    suspend fun searchStockPhoto(
+    fun generateWithAiHorde(
         context: Context,
-        query: String,
-        orientation: String = "squarish"
-    ): ImageGenResult = withContext(Dispatchers.IO) {
-        val prefs = com.jarvis.assistant.JarvisApp.instance.preferences
-        val cleanQuery = query.trim()
-        if (cleanQuery.isBlank()) return@withContext ImageGenResult.Failure("Please enter a search query.")
+        prompt: String,
+        stylePreset: String = "None",
+        aspectRatio: String = "1:1"
+    ): ImageGenResult {
+        val effectivePrompt = applyStylePreset(prompt, stylePreset)
+        val (width, height) = when (aspectRatio) {
+            "16:9" -> Pair(768, 512)
+            "9:16" -> Pair(512, 768)
+            "4:3" -> Pair(640, 512)
+            "3:4" -> Pair(512, 640)
+            else -> Pair(512, 512)
+        }
+        val requestJson = JSONObject().apply {
+            put("prompt", effectivePrompt)
+            put("params", JSONObject().apply {
+                put("sampler_name", "k_euler")
+                put("cfg_scale", 7.5)
+                put("steps", 20)
+                put("width", width)
+                put("height", height)
+            })
+        }
+        val postReq = Request.Builder()
+            .url("https://aihorde.net/api/v2/generate/async")
+            .addHeader("apikey", "0000000000")
+            .addHeader("Client-Agent", "SiyaAi:1.0:alphabits.site")
+            .post(requestJson.toString().toRequestBody("application/json; charset=utf-8".toMediaType()))
+            .build()
 
-        // 1. Try Unsplash
-        if (prefs.unsplashAccessKey.isNotBlank()) {
-            try {
-                val url = "https://api.unsplash.com/search/photos?query=${Uri.encode(cleanQuery)}&per_page=1"
-                val req = Request.Builder()
-                    .url(url)
-                    .addHeader("Authorization", "Client-ID ${prefs.unsplashAccessKey}")
+        return try {
+            val taskId = client.newCall(postReq).execute().use { resp ->
+                if (!resp.isSuccessful) return ImageGenResult.Failure("AI Horde request failed (${resp.code})")
+                val obj = JSONObject(resp.body?.string().orEmpty())
+                obj.optString("id", "")
+            }
+            if (taskId.isBlank()) return ImageGenResult.Failure("AI Horde did not return a job ID")
+
+            val checkUrl = "https://aihorde.net/api/v2/generate/status/$taskId"
+            var imageUrl = ""
+            var base64Data = ""
+            val startTime = System.currentTimeMillis()
+            while (System.currentTimeMillis() - startTime < 25_000L) {
+                try { Thread.sleep(2000L) } catch (_: InterruptedException) { break }
+                val checkReq = Request.Builder()
+                    .url(checkUrl)
+                    .addHeader("Client-Agent", "SiyaAi:1.0:alphabits.site")
                     .get()
                     .build()
-                client.newCall(req).execute().use { resp ->
+                client.newCall(checkReq).execute().use { resp ->
                     if (resp.isSuccessful) {
-                        val json = JSONObject(resp.body?.string().orEmpty())
-                        val results = json.optJSONArray("results")
-                        if (results != null && results.length() > 0) {
-                            val first = results.getJSONObject(0)
-                            val urls = first.optJSONObject("urls")
-                            val imageUrl = urls?.optString("regular", "") ?: ""
-                            if (imageUrl.isNotBlank()) {
-                                val dlResult = downloadAndSaveImage(context, imageUrl, "unsplash")
-                                if (dlResult != null) return@withContext ImageGenResult.Success(dlResult, "unsplash")
+                        val statusObj = JSONObject(resp.body?.string().orEmpty())
+                        val isDone = statusObj.optBoolean("done", false)
+                        val gens = statusObj.optJSONArray("generations")
+                        if (gens != null && gens.length() > 0) {
+                            val gen = gens.getJSONObject(0)
+                            val img = gen.optString("img", "")
+                            if (img.startsWith("http")) {
+                                imageUrl = img
+                            } else if (img.isNotBlank()) {
+                                base64Data = img
                             }
+                        }
+                        if (isDone && (imageUrl.isNotBlank() || base64Data.isNotBlank())) {
+                            return@use
                         }
                     }
                 }
-            } catch (_: Exception) {}
-        }
+                if (imageUrl.isNotBlank() || base64Data.isNotBlank()) break
+            }
 
-        // 2. Try Pexels
-        if (prefs.pexelsApiKey.isNotBlank()) {
-            try {
-                val url = "https://api.pexels.com/v1/search?query=${Uri.encode(cleanQuery)}&per_page=1"
-                val req = Request.Builder()
-                    .url(url)
-                    .addHeader("Authorization", prefs.pexelsApiKey)
-                    .get()
-                    .build()
-                client.newCall(req).execute().use { resp ->
-                    if (resp.isSuccessful) {
-                        val json = JSONObject(resp.body?.string().orEmpty())
-                        val photos = json.optJSONArray("photos")
-                        if (photos != null && photos.length() > 0) {
-                            val first = photos.getJSONObject(0)
-                            val src = first.optJSONObject("src")
-                            val imageUrl = src?.optString("large", "") ?: ""
-                            if (imageUrl.isNotBlank()) {
-                                val dlResult = downloadAndSaveImage(context, imageUrl, "pexels")
-                                if (dlResult != null) return@withContext ImageGenResult.Success(dlResult, "pexels")
-                            }
-                        }
-                    }
-                }
-            } catch (_: Exception) {}
+            if (imageUrl.isNotBlank()) {
+                val dlFile = downloadAndSaveImage(context, imageUrl, "ai-horde")
+                if (dlFile != null) return ImageGenResult.Success(dlFile, "ai-horde")
+            } else if (base64Data.isNotBlank()) {
+                val bytes = Base64.decode(base64Data, Base64.DEFAULT)
+                val saved = saveDecodedImage(context, bytes)
+                if (saved != null) return ImageGenResult.Success(saved, "ai-horde")
+            }
+            ImageGenResult.Failure("AI Horde generation timed out or worker unavailable")
+        } catch (e: Exception) {
+            ImageGenResult.Failure("AI Horde error: ${e.message}")
         }
-
-        // 3. Try Pixabay
-        if (prefs.pixabayApiKey.isNotBlank()) {
-            try {
-                val url = "https://pixabay.com/api/?key=${prefs.pixabayApiKey}&q=${Uri.encode(cleanQuery)}&image_type=photo&per_page=3"
-                val req = Request.Builder().url(url).get().build()
-                client.newCall(req).execute().use { resp ->
-                    if (resp.isSuccessful) {
-                        val json = JSONObject(resp.body?.string().orEmpty())
-                        val hits = json.optJSONArray("hits")
-                        if (hits != null && hits.length() > 0) {
-                            val first = hits.getJSONObject(0)
-                            val imageUrl = first.optString("largeImageURL", "")
-                            if (imageUrl.isNotBlank()) {
-                                val dlResult = downloadAndSaveImage(context, imageUrl, "pixabay")
-                                if (dlResult != null) return@withContext ImageGenResult.Success(dlResult, "pixabay")
-                            }
-                        }
-                    }
-                }
-            } catch (_: Exception) {}
-        }
-
-        // 4. Try Google PSE
-        if (prefs.googlePseApiKey.isNotBlank() && prefs.googlePseCx.isNotBlank()) {
-            try {
-                val url = "https://www.googleapis.com/customsearch/v1?key=${prefs.googlePseApiKey}&cx=${prefs.googlePseCx}&q=${Uri.encode(cleanQuery)}&searchType=image&num=1"
-                val req = Request.Builder().url(url).get().build()
-                client.newCall(req).execute().use { resp ->
-                    if (resp.isSuccessful) {
-                        val json = JSONObject(resp.body?.string().orEmpty())
-                        val items = json.optJSONArray("items")
-                        if (items != null && items.length() > 0) {
-                            val first = items.getJSONObject(0)
-                            val link = first.optString("link", "")
-                            if (link.isNotBlank()) {
-                                val dlResult = downloadAndSaveImage(context, link, "google-pse")
-                                if (dlResult != null) return@withContext ImageGenResult.Success(dlResult, "google-pse")
-                            }
-                        }
-                    }
-                }
-            } catch (_: Exception) {}
-        }
-
-        ImageGenResult.Failure("No stock photos found or search provider not configured.")
     }
 
     private fun downloadAndSaveImage(context: Context, url: String, providerTag: String): File? {
