@@ -87,9 +87,9 @@
                         android:id="@+id/tvModelWarningTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="SPEAKER MODEL NOT READY"
+                        android:text="Speaker model not installed (14 MB)"
                         android:textColor="@color/status_amber"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -97,10 +97,115 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="6dp"
-                        android:text="Speaker recognition model (final.ext.raw) is missing or loading. Voice enrollment is unavailable. Normal voice commands will proceed without blocking."
+                        android:text="Voice biometrics requires the open-source Vosk speaker recognition neural net to extract x-vectors and recognize your unique voice."
                         android:textColor="?attr/themeTextSecondary"
                         android:textSize="12sp"
                         android:lineSpacingExtra="2dp" />
+
+                    <TextView
+                        android:id="@+id/tvModelConsentLine"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Downloads the open-source Vosk speaker model from alphacephei.com. No personal data is sent."
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="11sp"
+                        android:lineSpacingExtra="2dp" />
+
+                    <!-- Action Buttons -->
+                    <LinearLayout
+                        android:id="@+id/layoutModelActionButtons"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="12dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDownloadModel"
+                            style="@style/Widget.Material3.Button"
+                            android:layout_width="0dp"
+                            android:layout_height="44dp"
+                            android:layout_weight="1"
+                            android:layout_marginEnd="6dp"
+                            android:text="DOWNLOAD (14 MB)"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:backgroundTint="?attr/themeAccent"
+                            android:textColor="#FFFFFF"
+                            app:cornerRadius="10dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnImportModel"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="44dp"
+                            android:text="IMPORT ZIP"
+                            android:textSize="12sp"
+                            android:textColor="?attr/themeTextPrimary"
+                            app:strokeColor="?attr/themeCardBorder"
+                            app:cornerRadius="10dp" />
+                    </LinearLayout>
+
+                    <!-- Download Progress Strip -->
+                    <LinearLayout
+                        android:id="@+id/layoutDownloadProgress"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone"
+                        android:layout_marginTop="12dp">
+
+                        <ProgressBar
+                            android:id="@+id/progressModelDownload"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="?attr/themeAccent" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:id="@+id/tvDownloadStatus"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Downloading: 0%"
+                                android:textColor="?attr/themeTextPrimary"
+                                android:textSize="12sp" />
+
+                            <TextView
+                                android:id="@+id/btnCancelDownload"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="6dp"
+                                android:text="CANCEL"
+                                android:textColor="#EF4444"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:clickable="true"
+                                android:focusable="true" />
+
+                            <TextView
+                                android:id="@+id/btnRetryDownload"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="6dp"
+                                android:text="RETRY"
+                                android:textColor="?attr/themeAccent"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:visibility="gone"
+                                android:clickable="true"
+                                android:focusable="true" />
+                        </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

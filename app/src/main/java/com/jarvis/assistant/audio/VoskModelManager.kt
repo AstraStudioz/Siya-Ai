@@ -16,6 +16,7 @@ import java.io.FileOutputStream
 
 enum class SpeakerModelStatus {
     READY,
+    DOWNLOADING,
     MISSING,
     CORRUPT
 }
@@ -78,8 +79,41 @@ object VoskModelManager {
     fun hasValidSpeakerModelFiles(dir: File): Boolean {
         if (!dir.exists() || !dir.isDirectory) return false
         val raw = File(dir, "final.ext.raw")
-        val mdl = File(dir, "spk.mdl")
-        return (raw.exists() && raw.length() > 0L) || (mdl.exists() && mdl.length() > 0L)
+        val mfcc = File(dir, "mfcc.conf")
+        val mean = File(dir, "mean.vec")
+        val mat = File(dir, "transform.mat")
+        val hasRawOrMdl = (raw.exists() && raw.length() > 5 * 1024 * 1024L) || (File(dir, "spk.mdl").exists() && File(dir, "spk.mdl").length() > 0L)
+        return hasRawOrMdl && mfcc.exists() && mfcc.length() > 0L && mean.exists() && mean.length() > 0L && mat.exists() && mat.length() > 0L
+    }
+
+    fun updateSpeakerModelStatus(status: SpeakerModelStatus) {
+        _speakerModelStatus.value = status
+        _isSpeakerModelReady.value = (status == SpeakerModelStatus.READY)
+    }
+
+    fun reloadSpeakerModel(context: Context): Boolean {
+        val spkTargetDir = File(context.filesDir, "vosk-spk-model")
+        if (hasValidSpeakerModelFiles(spkTargetDir)) {
+            return try {
+                val loadedSpk = SpeakerModel(spkTargetDir.absolutePath)
+                speakerModel = loadedSpk
+                _isSpeakerModelReady.value = true
+                _speakerModelStatus.value = SpeakerModelStatus.READY
+                Log.i(TAG, "Vosk SpeakerModel reloaded successfully!")
+                true
+            } catch (e: Throwable) {
+                speakerModel = null
+                _isSpeakerModelReady.value = false
+                _speakerModelStatus.value = SpeakerModelStatus.CORRUPT
+                Log.e(TAG, "Failed loading Vosk SpeakerModel: ${e.message}", e)
+                false
+            }
+        } else {
+            speakerModel = null
+            _isSpeakerModelReady.value = false
+            _speakerModelStatus.value = SpeakerModelStatus.CORRUPT
+            return false
+        }
     }
 
     fun hasValidSpeakerModelAssets(assetManager: AssetManager, path: String): Boolean {

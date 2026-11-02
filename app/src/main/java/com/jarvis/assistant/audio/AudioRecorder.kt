@@ -18,6 +18,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class AudioRecorder(
     private val context: android.content.Context? = null,
+    private val onBluetoothSilentFallback: (() -> Unit)? = null,
     private val onAudioChunk: (chunk: ByteArray, amplitude: Float, frequencyData: AudioFrequencyData) -> Unit
 ) {
     companion object {
@@ -185,6 +186,7 @@ class AudioRecorder(
                                             isMicSilenced.value = true
                                             micSilentReason.value = "Mic silenced by system / another app"
                                             Log.w("SiyaMic", "Mic RMS remained at 0 for 3 seconds. Marked MIC SILENT.")
+                                            onBluetoothSilentFallback?.invoke()
                                         }
                                     }
                                 } else {

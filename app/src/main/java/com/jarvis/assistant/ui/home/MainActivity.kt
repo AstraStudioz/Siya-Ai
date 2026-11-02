@@ -250,6 +250,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        JarvisConversationService.ensureAudioCapture()
         viewModel.refreshSettings()
         val prefs = com.jarvis.assistant.JarvisApp.instance.preferences
         if (appliedThemeKey != prefs.appTheme || appliedCustomHex != prefs.customThemeColor) {

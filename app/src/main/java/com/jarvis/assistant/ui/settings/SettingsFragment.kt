@@ -71,7 +71,8 @@ class SettingsFragment : Fragment() {
 
         // Owner Voice Profile Status
         val hasVoiceProfile = preferences.hasOwnerVoiceProfile()
-        if (hasVoiceProfile) {
+        val spkStatus = com.jarvis.assistant.audio.VoskModelManager.speakerModelStatus.value
+        if (hasVoiceProfile && spkStatus == com.jarvis.assistant.audio.SpeakerModelStatus.READY) {
             binding.tvOwnerVoiceBadge.text = "ACTIVE"
             binding.tvOwnerVoiceBadge.setTextColor(Color.parseColor("#10B981"))
             binding.tvOwnerVoiceBadge.setBackgroundResource(R.drawable.bg_jarvis_status_badge_green)
@@ -83,10 +84,21 @@ class SettingsFragment : Fragment() {
             binding.ivProfileVoiceBadgeIcon.setImageResource(R.drawable.ic_verified_badge)
             binding.ivProfileVoiceBadgeIcon.imageTintList = android.content.res.ColorStateList.valueOf(Color.parseColor("#10B981"))
         } else {
-            binding.tvOwnerVoiceBadge.text = "SETUP"
+            val badgeText = when (spkStatus) {
+                com.jarvis.assistant.audio.SpeakerModelStatus.READY -> "SETUP"
+                com.jarvis.assistant.audio.SpeakerModelStatus.DOWNLOADING -> "DOWNLOADING"
+                com.jarvis.assistant.audio.SpeakerModelStatus.CORRUPT -> "CORRUPT"
+                com.jarvis.assistant.audio.SpeakerModelStatus.MISSING -> "INSTALL"
+            }
+            binding.tvOwnerVoiceBadge.text = badgeText
             binding.tvOwnerVoiceBadge.setTextColor(ContextCompat.getColor(requireContext(), R.color.accent_sapphire))
             binding.tvOwnerVoiceBadge.setBackgroundResource(R.drawable.bg_jarvis_status_badge)
-            binding.tvOwnerVoiceSubtitle.text = "Not enrolled • Tap to record voice profile"
+            binding.tvOwnerVoiceSubtitle.text = when (spkStatus) {
+                com.jarvis.assistant.audio.SpeakerModelStatus.READY -> "Speaker Model: READY • Tap to record voice profile"
+                com.jarvis.assistant.audio.SpeakerModelStatus.DOWNLOADING -> "Speaker Model: DOWNLOADING • Please wait"
+                com.jarvis.assistant.audio.SpeakerModelStatus.CORRUPT -> "Speaker Model: CORRUPT • Tap to reinstall"
+                com.jarvis.assistant.audio.SpeakerModelStatus.MISSING -> "Speaker Model: MISSING • Tap to install (14 MB)"
+            }
 
             binding.tvProfileVoiceStatus.text = "ENROLL VOICE"
             binding.tvProfileVoiceStatus.setTextColor(ContextCompat.getColor(requireContext(), R.color.accent_sapphire))

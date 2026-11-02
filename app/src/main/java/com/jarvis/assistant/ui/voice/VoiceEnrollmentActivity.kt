@@ -62,6 +62,16 @@ class VoiceEnrollmentActivity : AppCompatActivity() {
         }
     }
 
+    private val importModelLauncher = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let { selectedUri ->
+            lifecycleScope.launch {
+                com.jarvis.assistant.audio.SpeakerModelDownloader.importFromFile(applicationContext, selectedUri)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         com.jarvis.assistant.util.ThemeManager.applyTheme(this)
         super.onCreate(savedInstanceState)
@@ -76,7 +86,9 @@ class VoiceEnrollmentActivity : AppCompatActivity() {
 
         setupUI()
         setupListeners()
+        setupDownloaderUI()
         observeModelStatus()
+        observeDownloaderState()
         checkPermissions()
     }
 
@@ -86,20 +98,98 @@ class VoiceEnrollmentActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupDownloaderUI() {
+        binding.btnDownloadModel.setOnClickListener {
+            lifecycleScope.launch {
+                com.jarvis.assistant.audio.SpeakerModelDownloader.downloadAndInstall(applicationContext)
+            }
+        }
+
+        binding.btnImportModel.setOnClickListener {
+            importModelLauncher.launch(arrayOf("application/zip", "application/octet-stream", "*/*"))
+        }
+
+        binding.btnCancelDownload.setOnClickListener {
+            com.jarvis.assistant.audio.SpeakerModelDownloader.cancel()
+        }
+
+        binding.btnRetryDownload.setOnClickListener {
+            lifecycleScope.launch {
+                com.jarvis.assistant.audio.SpeakerModelDownloader.downloadAndInstall(applicationContext)
+            }
+        }
+    }
+
+    private fun observeDownloaderState() {
+        lifecycleScope.launch {
+            com.jarvis.assistant.audio.SpeakerModelDownloader.downloadState.collect { state ->
+                when (state) {
+                    is com.jarvis.assistant.audio.SpeakerDownloadState.Idle -> {
+                        binding.layoutDownloadProgress.visibility = View.GONE
+                        binding.layoutModelActionButtons.visibility = View.VISIBLE
+                        binding.btnRetryDownload.visibility = View.GONE
+                    }
+                    is com.jarvis.assistant.audio.SpeakerDownloadState.Downloading -> {
+                        binding.layoutDownloadProgress.visibility = View.VISIBLE
+                        binding.layoutModelActionButtons.visibility = View.GONE
+                        binding.btnRetryDownload.visibility = View.GONE
+                        binding.progressModelDownload.progress = state.progress
+                        val mbRead = "%.1f".format(state.bytesRead / (1024f * 1024f))
+                        val mbTotal = if (state.totalBytes > 0) "%.1f MB".format(state.totalBytes / (1024f * 1024f)) else "14 MB"
+                        binding.tvDownloadStatus.text = "Downloading: ${state.progress}% ($mbRead / $mbTotal)"
+                    }
+                    is com.jarvis.assistant.audio.SpeakerDownloadState.Extracting -> {
+                        binding.layoutDownloadProgress.visibility = View.VISIBLE
+                        binding.layoutModelActionButtons.visibility = View.GONE
+                        binding.btnRetryDownload.visibility = View.GONE
+                        binding.tvDownloadStatus.text = "Extracting & verifying model files..."
+                    }
+                    is com.jarvis.assistant.audio.SpeakerDownloadState.Verifying -> {
+                        binding.layoutDownloadProgress.visibility = View.VISIBLE
+                        binding.layoutModelActionButtons.visibility = View.GONE
+                        binding.btnRetryDownload.visibility = View.GONE
+                        binding.tvDownloadStatus.text = "Validating x-vector neural network..."
+                    }
+                    is com.jarvis.assistant.audio.SpeakerDownloadState.Success -> {
+                        binding.cardModelStatusWarning.visibility = View.GONE
+                        Toast.makeText(this@VoiceEnrollmentActivity, "Speaker recognition model installed and ready!", Toast.LENGTH_SHORT).show()
+                    }
+                    is com.jarvis.assistant.audio.SpeakerDownloadState.Error -> {
+                        binding.layoutDownloadProgress.visibility = View.VISIBLE
+                        binding.layoutModelActionButtons.visibility = View.VISIBLE
+                        binding.btnRetryDownload.visibility = View.VISIBLE
+                        binding.tvDownloadStatus.text = state.message
+                        Toast.makeText(this@VoiceEnrollmentActivity, state.message, Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
+
     private fun observeModelStatus() {
         lifecycleScope.launch {
             VoskModelManager.speakerModelStatus.collect { status ->
                 val isReady = (status == SpeakerModelStatus.READY)
                 binding.cardModelStatusWarning.visibility = if (isReady) View.GONE else View.VISIBLE
                 if (!isReady) {
+                    binding.tvModelWarningTitle.text = when (status) {
+                        SpeakerModelStatus.DOWNLOADING -> "DOWNLOADING SPEAKER MODEL"
+                        SpeakerModelStatus.CORRUPT -> "SPEAKER MODEL CORRUPT"
+                        else -> "Speaker model not installed (14 MB)"
+                    }
                     binding.tvModelWarningDesc.text = when (status) {
-                        SpeakerModelStatus.MISSING -> "Speaker model neural net (final.ext.raw) is missing. Voice enrollment is unavailable. Normal voice commands proceed without blocking."
-                        SpeakerModelStatus.CORRUPT -> "Speaker model files are incomplete or corrupt. Voice enrollment is unavailable. Normal voice commands proceed without blocking."
+                        SpeakerModelStatus.MISSING -> "Voice biometrics requires the open-source Vosk speaker recognition neural net to extract x-vectors and recognize your unique voice."
+                        SpeakerModelStatus.CORRUPT -> "Speaker model files are incomplete or corrupt. Please redownload or re-import the model."
+                        SpeakerModelStatus.DOWNLOADING -> "Downloading open-source Vosk speaker model from alphacephei.com..."
                         else -> "Speaker model is initializing. Voice enrollment will become available once loaded."
                     }
                     if (currentSampleIndex < samplePrompts.size) {
                         binding.btnRecordSample.isEnabled = false
-                        binding.btnRecordSample.text = "SPEAKER MODEL UNAVAILABLE"
+                        binding.btnRecordSample.text = when (status) {
+                            SpeakerModelStatus.DOWNLOADING -> "SPEAKER MODEL DOWNLOADING..."
+                            SpeakerModelStatus.CORRUPT -> "SPEAKER MODEL CORRUPT"
+                            else -> "SPEAKER MODEL UNAVAILABLE"
+                        }
                     }
                 } else {
                     if (!isRecording && currentSampleIndex < samplePrompts.size) {

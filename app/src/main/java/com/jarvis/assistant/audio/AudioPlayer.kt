@@ -175,6 +175,11 @@ class AudioPlayer(
 
     fun isPlaying(): Boolean = isPlayingState.get() || !audioQueue.isEmpty()
 
+    /**
+     * Returns true if AudioPlayer is actively rendering or has unplayed PCM chunks queued.
+     */
+    fun hasUnplayedAudio(): Boolean = isPlayingState.get() || !audioQueue.isEmpty()
+
     fun release() {
         isRunning.set(false)
         playbackThread?.interrupt()

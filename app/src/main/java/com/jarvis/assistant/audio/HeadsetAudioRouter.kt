@@ -117,6 +117,52 @@ class HeadsetAudioRouter(private val context: Context) {
         }
     }
 
+    fun isBluetoothDeviceActive(): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val currentDevice = audioManager.communicationDevice
+            if (currentDevice != null && (
+                    currentDevice.type == AudioDeviceInfo.TYPE_BLE_HEADSET ||
+                    currentDevice.type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO
+                )) {
+                return true
+            }
+        }
+        return isScoStarted
+    }
+
+    /**
+     * If a Bluetooth communication device produces persistent silence (3s zero RMS),
+     * fallback to the phone's built-in mic.
+     */
+    fun switchToBuiltInMic() {
+        Log.w(TAG, "Switching to phone's built-in mic due to persistent silent Bluetooth input (3s zero RMS)")
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                val builtInMic = audioManager.availableCommunicationDevices.firstOrNull {
+                    it.type == AudioDeviceInfo.TYPE_BUILTIN_MIC
+                }
+                if (builtInMic != null) {
+                    audioManager.setCommunicationDevice(builtInMic)
+                    Log.i(TAG, "Set communication device to TYPE_BUILTIN_MIC")
+                } else {
+                    audioManager.clearCommunicationDevice()
+                    Log.i(TAG, "Cleared communication device to revert to default mic")
+                }
+            } else {
+                if (isScoStarted) {
+                    try {
+                        audioManager.stopBluetoothSco()
+                        audioManager.isBluetoothScoOn = false
+                    } catch (_: Exception) {}
+                    isScoStarted = false
+                    Log.i(TAG, "Stopped Bluetooth SCO to revert to built-in mic")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed switching to built-in mic: ${e.message}")
+        }
+    }
+
     /**
      * Dynamically chooses and sets the best communication device:
      * - Headset connected: route to headset mic and speaker.

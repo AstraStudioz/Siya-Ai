@@ -279,6 +279,8 @@ class GeminiLiveWebSocket(
                 put("system_instruction", JSONObject().apply {
                     put("parts", JSONArray().put(JSONObject().put("text", effectivePrompt)))
                 })
+                put("inputAudioTranscription", JSONObject())
+                put("outputAudioTranscription", JSONObject())
                 put("generation_config", JSONObject().apply {
                     put("response_modalities", JSONArray().put("AUDIO"))
                     put("speech_config", JSONObject().apply {
@@ -790,6 +792,7 @@ class GeminiLiveWebSocket(
 
     private fun handleIncomingMessage(jsonText: String) {
         try {
+            com.jarvis.assistant.audio.MicDiagnosticsTracker.recordServerMessage()
             val json = JSONObject(jsonText)
 
             // Check if server returned an error payload
@@ -906,6 +909,7 @@ class GeminiLiveWebSocket(
                         }
                     }
                     if (userText.isNotBlank()) {
+                        com.jarvis.assistant.audio.MicDiagnosticsTracker.recordInputTranscription(userText)
                         listener.onUserTextReceived(userText)
                     }
                 }
@@ -938,6 +942,7 @@ class GeminiLiveWebSocket(
 
                 val modelTurn = serverContent.optJSONObject("modelTurn")
                 if (modelTurn != null) {
+                    com.jarvis.assistant.audio.MicDiagnosticsTracker.recordModelTurn()
                     val parts = modelTurn.optJSONArray("parts")
                     if (parts != null) {
                         for (i in 0 until parts.length()) {
@@ -1013,12 +1018,18 @@ class GeminiLiveWebSocket(
         }
     }
 
+    private var hasLoggedAudioFormat = false
+
     fun sendAudioChunk(pcm16k: ByteArray) {
         if (!isConnected.get() || !isSetupComplete.get() || pcm16k.isEmpty()) return
 
         try {
+            if (!hasLoggedAudioFormat) {
+                hasLoggedAudioFormat = true
+                Log.i(TAG, "Streaming audio to Gemini Live: 16-bit mono little-endian PCM at 16 kHz (mimeType=audio/pcm;rate=16000)")
+            }
             val base64Audio = Base64.encodeToString(pcm16k, Base64.NO_WRAP)
-            val json = "{\"realtimeInput\":{\"audio\":{\"mimeType\":\"audio/pcm;rate=16000\",\"data\":\"$base64Audio\"}}}"
+            val json = "{\"realtimeInput\":{\"mediaChunks\":[{\"mimeType\":\"audio/pcm;rate=16000\",\"data\":\"$base64Audio\"}]}}"
             webSocket?.send(json)
         } catch (e: Exception) {
             Log.e(TAG, "Error sending audio chunk: ${e.message}")

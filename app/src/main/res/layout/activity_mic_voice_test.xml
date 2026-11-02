@@ -379,6 +379,408 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- Card 5: Pipeline Counters & Live Telemetry -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="16dp"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="MIC &amp; PIPELINE TELEMETRY"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="11sp"
+                        android:letterSpacing="0.08"
+                        android:fontFamily="sans-serif-medium"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnCopyDiagnostics"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Copy Diagnostics"
+                        android:textSize="11sp"
+                        android:textColor="?attr/themeAccent" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Frames captured / sec:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/tvCounterFps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 fps"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="6dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Last Audio RMS:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/tvCounterRms"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0.0000"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?attr/themeCardBorder"
+                    android:layout_marginVertical="8dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Frames Dropped By Gate Reason:"
+                    android:textColor="?attr/themeTextMuted"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="• SESSION_OFF:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tvDroppedSessionOff"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="• OWN_PLAYBACK:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tvDroppedOwnPlayback"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="• TAIL_GUARD (150ms):"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tvDroppedTailGuard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="• SESSION_NOT_READY:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tvDroppedSessionNotReady"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="• OWNER_PENDING:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tvDroppedOwnerPending"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="• MUTED:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="12sp" />
+                    <TextView
+                        android:id="@+id/tvDroppedMuted"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?attr/themeCardBorder"
+                    android:layout_marginVertical="8dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Audio Chunks / Bytes Sent:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/tvChunksBytesSent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0 chunks (0 KB)"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Server Messages Received:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/tvServerMessages"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Input Transcriptions:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/tvInputTranscriptions"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="4dp">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Model Turn Responses:"
+                        android:textColor="?attr/themeTextMuted"
+                        android:textSize="13sp" />
+                    <TextView
+                        android:id="@+id/tvModelTurns"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="?attr/themeTextPrimary"
+                        android:textSize="13sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Last Gemini Heard (Screen Only):"
+                    android:textColor="?attr/themeTextMuted"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvLastGeminiHeard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="(None yet)"
+                    android:textColor="?attr/themeTextPrimary"
+                    android:textSize="13sp"
+                    android:background="@drawable/bg_jarvis_chip"
+                    android:padding="8dp" />
+            </LinearLayout>
+
+            <!-- Card 6: 8-Second Hearing Test -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_jarvis_card"
+                android:padding="16dp"
+                android:layout_marginBottom="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HEARING TEST (8 SECONDS)"
+                    android:textColor="?attr/themeTextMuted"
+                    android:textSize="11sp"
+                    android:letterSpacing="0.08"
+                    android:fontFamily="sans-serif-medium"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tap start and speak naturally for 8 seconds. Diagnoses the exact failure stage if Siya cannot hear you."
+                    android:textColor="?attr/themeTextSecondary"
+                    android:textSize="12sp"
+                    android:lineSpacingExtra="2dp"
+                    android:layout_marginBottom="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStartHearingTest"
+                    style="@style/Widget.Material3.Button"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="START HEARING TEST"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:backgroundTint="?attr/themeAccent"
+                    android:textColor="#FFFFFF"
+                    app:cornerRadius="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/layoutHearingTestResult"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="12dp">
+
+                    <TextView
+                        android:id="@+id/tvHearingTestStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TESTING..."
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/themeAccent" />
+
+                    <TextView
+                        android:id="@+id/tvHearingTestDetail"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Listening to microphone..."
+                        android:textColor="?attr/themeTextSecondary"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="2dp" />
+                </LinearLayout>
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

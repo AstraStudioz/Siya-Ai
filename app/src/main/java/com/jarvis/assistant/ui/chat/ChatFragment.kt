@@ -2,6 +2,7 @@ package com.jarvis.assistant.ui.chat
 
 import android.content.Intent
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -19,6 +21,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jarvis.assistant.JarvisApp
 import com.jarvis.assistant.R
+import com.jarvis.assistant.background.JarvisConversationService
 import com.jarvis.assistant.chat.IntentRouter
 import com.jarvis.assistant.data.model.ChatAttachment
 import com.jarvis.assistant.databinding.FragmentChatBinding
@@ -189,6 +192,25 @@ class ChatFragment : Fragment() {
             sendMessage()
         }
 
+        // Voice Mic Button in Chat
+        binding.btnChatMic.setOnClickListener {
+            if (!JarvisConversationService.isSessionOn.value) {
+                JarvisConversationService.startSession(requireContext())
+                if (preferences.isMicMuted) {
+                    preferences.isMicMuted = false
+                    JarvisConversationService.setMicMuted(false)
+                }
+                Toast.makeText(requireContext(), "Voice session activated", Toast.LENGTH_SHORT).show()
+            } else {
+                val newMuted = !preferences.isMicMuted
+                preferences.isMicMuted = newMuted
+                JarvisConversationService.setMicMuted(newMuted)
+                val msg = if (newMuted) "Microphone muted" else "Microphone unmuted (Listening)"
+                Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+            }
+            updateChatMicUI()
+        }
+
         // New Chat "+" Action: Creates new session without destroying old ones
         binding.btnChatNew.setOnClickListener {
             chatRepository.createNewSession("New Chat")
@@ -216,6 +238,42 @@ class ChatFragment : Fragment() {
         observeChatTurns()
         observeActiveSessionTitle()
         observeRestRunningState()
+        observeMicState()
+    }
+
+    private fun observeMicState() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            JarvisConversationService.isSessionOn.collect {
+                updateChatMicUI()
+            }
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.isMicMuted.collect {
+                updateChatMicUI()
+            }
+        }
+    }
+
+    private fun updateChatMicUI() {
+        if (!isAdded) return
+        val isOn = JarvisConversationService.isSessionOn.value
+        val isMuted = preferences.isMicMuted
+        if (!isOn) {
+            binding.btnChatMic.setImageResource(R.drawable.ic_mic_jarvis)
+            binding.btnChatMic.imageTintList = android.content.res.ColorStateList.valueOf(
+                ContextCompat.getColor(requireContext(), R.color.text_secondary)
+            )
+        } else if (isMuted) {
+            binding.btnChatMic.setImageResource(R.drawable.ic_mic_mute_jarvis)
+            binding.btnChatMic.imageTintList = android.content.res.ColorStateList.valueOf(
+                Color.parseColor("#EF4444")
+            )
+        } else {
+            binding.btnChatMic.setImageResource(R.drawable.ic_mic_jarvis)
+            binding.btnChatMic.imageTintList = android.content.res.ColorStateList.valueOf(
+                Color.parseColor("#10B981")
+            )
+        }
     }
 
     private fun showAutoSwitchBanner(fromMode: String, toMode: String) {

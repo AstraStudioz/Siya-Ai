@@ -156,6 +156,27 @@ class JarvisConversationService : Service() {
             activeInstance?.audioRecorder?.setMuted(muted)
         }
 
+        fun startSession(context: Context) {
+            val intent = Intent(context, JarvisConversationService::class.java)
+                .setAction(ACTION_START_CONVERSATION)
+            androidx.core.content.ContextCompat.startForegroundService(context, intent)
+        }
+
+        fun stopSession(context: Context) {
+            val intent = Intent(context, JarvisConversationService::class.java)
+                .setAction(ACTION_STOP_ALL)
+            androidx.core.content.ContextCompat.startForegroundService(context, intent)
+        }
+
+        fun ensureAudioCapture() {
+            activeInstance?.let { service ->
+                if (_isSessionOn.value && service.audioRecorder == null) {
+                    Log.i("JarvisService", "ensureAudioCapture: audioRecorder was null while session is ON. Restarting capture.")
+                    service.startSpeechCapture()
+                }
+            }
+        }
+
         fun triggerActiveListening() {
             activeInstance?.let { service ->
                 if (_isStandby.value) {
@@ -828,6 +849,8 @@ class JarvisConversationService : Service() {
             }
         ).apply { start() }
 
+        startSpeechCapture()
+
         serviceScope.launch(Dispatchers.IO) {
             val systemPrompt = generateCurrentSystemPrompt()
 
@@ -1378,120 +1401,141 @@ class JarvisConversationService : Service() {
 
     private var lastNonLivePlaybackEndTime = 0L
 
-    private fun startSpeechCapture() {
-        val recorder = AudioRecorder(applicationContext) { chunk, amplitude, frequencyData ->
-            if (_isSessionOn.value) {
-                val now = System.currentTimeMillis()
+    internal fun startSpeechCapture() {
+        val recorder = AudioRecorder(
+            context = applicationContext,
+            onBluetoothSilentFallback = {
+                if (headsetAudioRouter?.isBluetoothDeviceActive() == true) {
+                    headsetAudioRouter?.switchToBuiltInMic()
+                }
+            }
+        ) { chunk, amplitude, frequencyData ->
+            if (!_isSessionOn.value) {
+                com.jarvis.assistant.audio.MicDiagnosticsTracker.recordFrameDropped(
+                    com.jarvis.assistant.audio.DropReason.SESSION_OFF
+                )
+                return@AudioRecorder
+            }
 
-                // Acoustic Echo Decay Protection (AEDP):
-                // For 150ms after speaker audio stops, discard mic chunks so room reverberation
-                // does not bounce into Gemini Live and cause false self-interruption.
-                // External media playback (YouTube, Spotify, etc.) MUST NEVER drop mic frames.
-                val msSincePlaybackEnd = now - lastPlaybackEndTime
-                if (com.jarvis.assistant.audio.MicFrameGate.shouldDropMicFrame(
-                        ownPlaybackActive = false,
-                        msSinceOwnPlaybackEnd = msSincePlaybackEnd,
-                        echoTailGuardMs = com.jarvis.assistant.audio.MicFrameGate.DEFAULT_ECHO_TAIL_GUARD_MS
-                    )
-                ) {
-                    consecutiveVoicedFrames = 0
+            if (audioRecorder?.isMuted?.get() == true) {
+                com.jarvis.assistant.audio.MicDiagnosticsTracker.recordFrameDropped(
+                    com.jarvis.assistant.audio.DropReason.MUTED
+                )
+                return@AudioRecorder
+            }
+
+            val now = System.currentTimeMillis()
+            com.jarvis.assistant.audio.MicDiagnosticsTracker.recordFrameCaptured(amplitude)
+
+            // "Assistant is speaking" must come ONLY from AudioPlayer having unplayed PCM queued (plus a 150 ms tail).
+            // It resets on turnComplete, interrupted and flush. Do not use conversationState == SPEAKING as a gate.
+            // Watchdog 8 s with a logged reason.
+            val isPlaying = audioPlayer?.hasUnplayedAudio() == true
+            if (isPlaying) {
+                if (speakerStateActiveSinceMs == 0L) {
+                    speakerStateActiveSinceMs = now
+                } else if (now - speakerStateActiveSinceMs > 8_000L) {
+                    Log.w("JarvisService", "Mic watchdog: Assistant playback active for >8s without release. Resetting playback tail.")
+                    speakerStateActiveSinceMs = 0L
+                    audioPlayer?.flush()
+                    lastPlaybackEndTime = now
+                }
+            } else {
+                speakerStateActiveSinceMs = 0L
+            }
+
+            val msSincePlaybackEnd = now - lastPlaybackEndTime
+
+            // Headset voice barge-in:
+            val hasHeadset = headsetAudioRouter?.isHeadsetConnected() == true
+            if (hasHeadset && isPlaying && amplitude > 0.25f) {
+                consecutiveVoicedFrames++
+                if (consecutiveVoicedFrames >= 4) {
+                    Log.i("JarvisService", "Headset voice barge-in: user spoke over assistant (amp=$amplitude)")
+                    suppressAudioUntilTurnComplete = true
+                    audioPlayer?.flush()
+                    lastPlaybackEndTime = now
+                    setConversationState(ConversationState.LISTENING)
+                    lastUserSpeechDetectedTime = now
+                    hasSpeechInCurrentUtterance = true
+                    hasSignalledUtteranceEnd = false
+                    audioChunksSentInCurrentUtterance = 0
+                    currentTurnUserText.clear()
+                    currentTurnAssistantText.clear()
+                    _liveUserTranscript.value = ""
+                    _liveAssistantResponse.value = ""
+                    hasExecutedCommandInCurrentTurn = false
+                    totalVoicedFramesInCurrentUtterance = 4
+                    synchronized(currentUtteranceAudioStream) {
+                        currentUtteranceAudioStream.reset()
+                        currentUtteranceAudioStream.write(chunk)
+                    }
+                    isCurrentTurnOwnerVoiceVerified = !preferences.isOwnerVoiceEnabled || !preferences.hasOwnerVoiceProfile()
                     return@AudioRecorder
                 }
-
-                // Assistant is speaking / AudioTrack is actively playing:
-                val isSpeakerActive = (audioPlayer?.isPlaying() == true) ||
-                        (_conversationState.value == ConversationState.SPEAKING)
-
-                if (isSpeakerActive) {
-                    if (speakerStateActiveSinceMs == 0L) {
-                        speakerStateActiveSinceMs = now
-                    } else if (now - speakerStateActiveSinceMs > 20_000L) {
-                        Log.w("JarvisService", "Mic watchdog: Assistant stuck in SPEAKING/isPlaying for >20s. Force resetting to LISTENING.")
-                        speakerStateActiveSinceMs = 0L
-                        audioPlayer?.flush()
-                        setConversationState(ConversationState.LISTENING)
-                    }
-
-                    val hasHeadset = headsetAudioRouter?.isHeadsetConnected() == true
-                    // Only allow voice barge-in if headphones/headset are connected AND assistant is already speaking!
-                    // Over the phone loudspeaker, acoustic leakage from speaker into microphone
-                    // hits amplitudes of 0.8-1.0, which causes false self-interruption ("talks in middle and cuts off").
-                    // Over loudspeaker, users tap mic/orb to interrupt, as prompted on screen.
-                    if (hasHeadset) {
-                        if (amplitude > 0.25f) {
-                            consecutiveVoicedFrames++
-                            if (consecutiveVoicedFrames >= 4) {
-                                Log.i("JarvisService", "Headset voice barge-in: user spoke over assistant (amp=$amplitude)")
-                                suppressAudioUntilTurnComplete = true
-                                audioPlayer?.flush()
-                                setConversationState(ConversationState.LISTENING)
-                                lastUserSpeechDetectedTime = now
-                                hasSpeechInCurrentUtterance = true
-                                hasSignalledUtteranceEnd = false
-                                audioChunksSentInCurrentUtterance = 0
-                                currentTurnUserText.clear()
-                                currentTurnAssistantText.clear()
-                                _liveUserTranscript.value = ""
-                                _liveAssistantResponse.value = ""
-                                hasExecutedCommandInCurrentTurn = false
-                                totalVoicedFramesInCurrentUtterance = 4
-                                synchronized(currentUtteranceAudioStream) {
-                                    currentUtteranceAudioStream.reset()
-                                    currentUtteranceAudioStream.write(chunk)
-                                }
-                                isCurrentTurnOwnerVoiceVerified = !preferences.isOwnerVoiceEnabled || !preferences.hasOwnerVoiceProfile()
-                                return@AudioRecorder
-                            }
-                        } else {
-                            consecutiveVoicedFrames = 0
-                        }
-                    } else {
-                        consecutiveVoicedFrames = 0
-                    }
-                    // Suppress mic audio from streaming to Gemini ONLY while assistant is physically speaking without headset barge-in.
-                    if (com.jarvis.assistant.audio.MicFrameGate.shouldDropMicFrame(
-                            ownPlaybackActive = true,
-                            msSinceOwnPlaybackEnd = msSincePlaybackEnd
-                        )
-                    ) {
-                        return@AudioRecorder
-                    }
-                } else {
-                    speakerStateActiveSinceMs = 0L
+            } else {
+                if (isPlaying) {
+                    consecutiveVoicedFrames = 0
                 }
+            }
 
-                // Stream user speech to Gemini Live
-                if (preferences.isOwnerVoiceEnabled && preferences.hasOwnerVoiceProfile()) {
-                    // Audit Gemini audio leak: Buffer audio and hold back until verdict so non-owner audio never reaches Gemini before verdict
-                    if (isCurrentTurnOwnerVoiceVerified || isCurrentTurnVoiceStatus == com.jarvis.assistant.audio.VoiceMatchStatus.UNCERTAIN) {
-                        while (!preVerificationAudioQueue.isEmpty()) {
-                            val queued = preVerificationAudioQueue.poll() ?: break
-                            liveWebSocket?.sendAudioChunk(queued)
-                            audioChunksSentInCurrentUtterance++
-                        }
-                        liveWebSocket?.sendAudioChunk(chunk)
+            if (isPlaying) {
+                com.jarvis.assistant.audio.MicDiagnosticsTracker.recordFrameDropped(
+                    com.jarvis.assistant.audio.DropReason.OWN_PLAYBACK
+                )
+                return@AudioRecorder
+            }
+
+            if (msSincePlaybackEnd in 0 until 150L) {
+                com.jarvis.assistant.audio.MicDiagnosticsTracker.recordFrameDropped(
+                    com.jarvis.assistant.audio.DropReason.TAIL_GUARD
+                )
+                return@AudioRecorder
+            }
+
+            // Stream user speech to Gemini Live
+            if (preferences.isOwnerVoiceEnabled && preferences.hasOwnerVoiceProfile()) {
+                if (isCurrentTurnOwnerVoiceVerified || isCurrentTurnVoiceStatus == com.jarvis.assistant.audio.VoiceMatchStatus.UNCERTAIN) {
+                    while (!preVerificationAudioQueue.isEmpty()) {
+                        val queued = preVerificationAudioQueue.poll() ?: break
+                        liveWebSocket?.sendAudioChunk(queued)
+                        com.jarvis.assistant.audio.MicDiagnosticsTracker.recordChunkSent(queued.size)
                         audioChunksSentInCurrentUtterance++
-                    } else {
-                        if (preVerificationAudioQueue.size < 300) {
-                            preVerificationAudioQueue.offer(chunk.copyOf())
-                        }
                     }
+                    liveWebSocket?.sendAudioChunk(chunk)
+                    com.jarvis.assistant.audio.MicDiagnosticsTracker.recordChunkSent(chunk.size)
+                    audioChunksSentInCurrentUtterance++
                 } else {
-                    if (liveWebSocket?.isSessionReady() == true) {
-                        while (!preConnectAudioQueue.isEmpty()) {
-                            val queued = preConnectAudioQueue.poll() ?: break
-                            liveWebSocket?.sendAudioChunk(queued)
-                            audioChunksSentInCurrentUtterance++
-                        }
-                        liveWebSocket?.sendAudioChunk(chunk)
-                        audioChunksSentInCurrentUtterance++
-                    } else {
-                        // Connection warming up: buffer up to 150 chunks (~3.0s of audio) so early speech is never lost
-                        if (preConnectAudioQueue.size < 150) {
-                            preConnectAudioQueue.offer(chunk.copyOf())
-                        }
+                    com.jarvis.assistant.audio.MicDiagnosticsTracker.recordFrameDropped(
+                        com.jarvis.assistant.audio.DropReason.OWNER_PENDING
+                    )
+                    if (preVerificationAudioQueue.size < 300) {
+                        preVerificationAudioQueue.offer(chunk.copyOf())
                     }
                 }
+            } else {
+                // Continuous send rule: When owner voice lock is OFF or un-enrolled,
+                // stream EVERY captured chunk to Gemini as soon as setupComplete has arrived
+                if (liveWebSocket?.isSessionReady() == true) {
+                    while (!preConnectAudioQueue.isEmpty()) {
+                        val queued = preConnectAudioQueue.poll() ?: break
+                        liveWebSocket?.sendAudioChunk(queued)
+                        com.jarvis.assistant.audio.MicDiagnosticsTracker.recordChunkSent(queued.size)
+                        audioChunksSentInCurrentUtterance++
+                    }
+                    liveWebSocket?.sendAudioChunk(chunk)
+                    com.jarvis.assistant.audio.MicDiagnosticsTracker.recordChunkSent(chunk.size)
+                    audioChunksSentInCurrentUtterance++
+                } else {
+                    com.jarvis.assistant.audio.MicDiagnosticsTracker.recordFrameDropped(
+                        com.jarvis.assistant.audio.DropReason.SESSION_NOT_READY
+                    )
+                    // Connection warming up: buffer up to 150 chunks (~3.0s of audio) so early speech is never lost
+                    if (preConnectAudioQueue.size < 150) {
+                        preConnectAudioQueue.offer(chunk.copyOf())
+                    }
+                }
+            }
 
                 // Track ambient noise floor adaptively when quiet (clamped to max 0.05f)
                 if (amplitude < 0.05f) {
@@ -1690,7 +1734,6 @@ class JarvisConversationService : Service() {
                         _audioLevel.value = 0f
                     }
                 }
-            }
         }.apply {
             sensitivityGain = when (preferences.micSensitivity) {
                 "high" -> 1.4f

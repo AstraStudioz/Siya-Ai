@@ -125,6 +125,7 @@ class CameraVisionActivity : AppCompatActivity() {
         } else if (!JarvisConversationService.isSessionOn.value) {
             viewModel.toggleSession()
         }
+        JarvisConversationService.ensureAudioCapture()
         monitorSessionStatus()
     }
 
@@ -209,7 +210,15 @@ class CameraVisionActivity : AppCompatActivity() {
 
         // Mic Button
         binding.btnMicToggle.setOnClickListener {
-            viewModel.toggleMicMute()
+            if (!JarvisConversationService.isSessionOn.value) {
+                viewModel.toggleSession()
+                if (viewModel.isMicMuted.value) {
+                    viewModel.toggleMicMute()
+                }
+                monitorSessionStatus()
+            } else {
+                viewModel.toggleMicMute()
+            }
         }
     }
 
