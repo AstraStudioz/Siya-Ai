@@ -507,11 +507,13 @@
                 android:id="@+id/tvUnifiedFooter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Siya Ai • Crafted by Alpha Bits • alphabits.site"
+                android:text="Siya Ai • Powered by Astra Studios"
                 android:textColor="?attr/themeTextMuted"
                 android:textSize="12sp"
                 android:gravity="center"
                 android:fontFamily="sans-serif"
+                android:clickable="true"
+                android:focusable="true"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="24dp" />
 

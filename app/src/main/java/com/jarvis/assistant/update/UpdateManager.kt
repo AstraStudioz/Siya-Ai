@@ -164,6 +164,16 @@ object UpdateManager {
         }
     }
 
+    private fun JsonObject.getNullableString(key: String): String? {
+        val element = get(key) ?: return null
+        if (element.isJsonNull) return null
+        return try {
+            if (element.isJsonPrimitive) element.asString else null
+        } catch (_: Exception) {
+            null
+        }
+    }
+
     private fun fetchFromDirectJson(url: String): UpdateInfo? {
         val request = Request.Builder()
             .url(url)
@@ -177,7 +187,38 @@ object UpdateManager {
                     return null
                 }
                 val body = response.body?.string() ?: return null
-                gson.fromJson(body, UpdateInfo::class.java)
+                val parsed = JsonParser.parseString(body)
+                if (!parsed.isJsonObject) return null
+                val obj = parsed.asJsonObject
+
+                val versionCode = obj.get("versionCode")?.let {
+                    if (it.isJsonPrimitive) {
+                        try { it.asInt } catch (_: Exception) { null }
+                    } else null
+                } ?: return null
+
+                val versionName = obj.getNullableString("versionName") ?: "1.0.$versionCode"
+                val changelog = obj.getNullableString("changelog") ?: ""
+                val apkUrl = obj.getNullableString("apkUrl") ?: return null
+                val apkSha256 = obj.getNullableString("apkSha256") ?: ""
+                val telegramUrl = obj.getNullableString("telegramUrl") ?: ""
+                val mandatory = obj.get("mandatory")?.let {
+                    if (it.isJsonPrimitive) {
+                        try { it.asBoolean } catch (_: Exception) { false }
+                    } else false
+                } ?: false
+                val publishedAt = obj.getNullableString("publishedAt") ?: ""
+
+                UpdateInfo(
+                    versionCode = versionCode,
+                    versionName = versionName,
+                    changelog = changelog,
+                    apkUrl = apkUrl,
+                    apkSha256 = apkSha256,
+                    telegramUrl = telegramUrl,
+                    mandatory = mandatory,
+                    publishedAt = publishedAt
+                )
             }
         } catch (e: Exception) {
             Log.w(TAG, "Direct update.json request failed: ${e.message}")
@@ -209,31 +250,47 @@ object UpdateManager {
 
     /**
      * Parses raw GitHub Releases API JSON to synthesize UpdateInfo if update.json wasn't directly found.
+     * Safely handles JsonNull and missing fields without throwing UnsupportedOperationException.
      */
     fun parseGitHubReleaseJson(jsonString: String): UpdateInfo? {
         return try {
-            val root = JsonParser.parseString(jsonString).asJsonObject
-            val tagName = root.get("tag_name")?.asString ?: "1.0.0"
-            val bodyText = root.get("body")?.asString ?: "New release available."
-            val publishedAt = root.get("published_at")?.asString ?: ""
+            val parsed = JsonParser.parseString(jsonString)
+            if (!parsed.isJsonObject) {
+                Log.w(TAG, "GitHub release fallback JSON is not a JSON object")
+                return null
+            }
+            val root = parsed.asJsonObject
+            val tagName = root.getNullableString("tag_name") ?: "1.0.0"
+            val bodyText = root.getNullableString("body")?.ifBlank { "New release available." } ?: "New release available."
+            val publishedAt = root.getNullableString("published_at") ?: ""
 
             // Extract numeric version code from tag name (e.g., debug-apk-build-147-1 -> 147, or v1.0.147 -> 147)
-            val versionCodeMatch = Regex("""\b(\d+)\b""").findAll(tagName).lastOrNull()?.value?.toIntOrNull()
-                ?: (BuildConfig.VERSION_CODE + 1)
+            val tagVersionCode = Regex("""\b(\d+)\b""").findAll(tagName).lastOrNull()?.value?.toIntOrNull()
 
-            val assets = root.getAsJsonArray("assets") ?: return null
+            val assetsElement = root.get("assets")
+            val assets = if (assetsElement != null && assetsElement.isJsonArray) {
+                assetsElement.asJsonArray
+            } else {
+                Log.w(TAG, "GitHub release has no valid assets array")
+                return null
+            }
+
             var apkUrl: String? = null
             var updateJsonUrl: String? = null
+            var apkNameVersionCode: Int? = null
 
             for (i in 0 until assets.size()) {
-                val asset = assets.get(i).asJsonObject
-                val name = asset.get("name")?.asString ?: ""
-                val downloadUrl = asset.get("browser_download_url")?.asString ?: ""
+                val item = assets.get(i)
+                if (!item.isJsonObject) continue
+                val asset = item.asJsonObject
+                val name = asset.getNullableString("name") ?: ""
+                val downloadUrl = asset.getNullableString("browser_download_url") ?: ""
 
                 if (name.equals("update.json", ignoreCase = true)) {
                     updateJsonUrl = downloadUrl
                 } else if (name.endsWith(".apk", ignoreCase = true)) {
                     apkUrl = downloadUrl
+                    apkNameVersionCode = Regex("""\b(\d+)\b""").findAll(name).lastOrNull()?.value?.toIntOrNull()
                 }
             }
 
@@ -243,15 +300,21 @@ object UpdateManager {
                 if (direct != null) return direct
             }
 
-            if (apkUrl.isNullOrBlank()) return null
+            if (apkUrl.isNullOrBlank()) {
+                Log.w(TAG, "No APK asset found in GitHub release")
+                return null
+            }
+
+            val finalVersionCode = tagVersionCode ?: apkNameVersionCode ?: (BuildConfig.VERSION_CODE + 1)
+            val cleanedVersionName = tagName.removePrefix("v").substringBefore("-").ifBlank { "1.0.$finalVersionCode" }
 
             UpdateInfo(
-                versionCode = versionCodeMatch,
-                versionName = tagName.removePrefix("v").substringBefore("-"),
+                versionCode = finalVersionCode,
+                versionName = cleanedVersionName,
                 changelog = bodyText,
                 apkUrl = apkUrl,
                 apkSha256 = "",
-                telegramUrl = "https://t.me/alphabit_s",
+                telegramUrl = com.jarvis.assistant.util.BrandConfig.TELEGRAM_CHANNEL_URL,
                 mandatory = false,
                 publishedAt = publishedAt
             )

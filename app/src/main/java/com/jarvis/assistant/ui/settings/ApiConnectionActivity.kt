@@ -82,6 +82,10 @@ class ApiConnectionActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
+        binding.tvUnifiedFooter.setOnClickListener {
+            com.jarvis.assistant.util.ExternalLinks.open(this, com.jarvis.assistant.util.BrandConfig.TELEGRAM_CHANNEL_URL)
+        }
+
         binding.btnPasteKey.setOnClickListener {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val item = clipboard.primaryClip?.getItemAt(0)

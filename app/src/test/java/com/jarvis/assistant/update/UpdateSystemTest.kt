@@ -23,7 +23,7 @@ class UpdateSystemTest {
               "changelog": "Added camera neural vision improvements",
               "apkUrl": "https://github.com/AstraStudioz/Siya-Ai/releases/download/v1.0.150/Siya-AI-build-150.apk",
               "apkSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-              "telegramUrl": "https://t.me/alphabit_s/42",
+              "telegramUrl": "https://t.me/AstraStudiosPvt/42",
               "mandatory": false,
               "publishedAt": "2026-11-04T12:00:00Z"
             }
@@ -36,7 +36,7 @@ class UpdateSystemTest {
         assertEquals("Added camera neural vision improvements", info.changelog)
         assertEquals("https://github.com/AstraStudioz/Siya-Ai/releases/download/v1.0.150/Siya-AI-build-150.apk", info.apkUrl)
         assertEquals("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", info.apkSha256)
-        assertEquals("https://t.me/alphabit_s/42", info.telegramUrl)
+        assertEquals("https://t.me/AstraStudiosPvt/42", info.telegramUrl)
         assertFalse(info.mandatory)
         assertEquals("2026-11-04T12:00:00Z", info.publishedAt)
     }
@@ -64,6 +64,33 @@ class UpdateSystemTest {
         assertEquals("1.0.152", info?.versionName)
         assertTrue(info?.changelog?.contains("New UI update badge") == true)
         assertEquals("https://github.com/AstraStudioz/Siya-Ai/releases/download/v1.0.152/Siya-AI-build-152.apk", info?.apkUrl)
+    }
+
+    @Test
+    fun testGitHubReleaseWithJsonNullFields() {
+        // Simulates GitHub API response where release notes, name, or other fields are explicitly null
+        val jsonWithNulls = """
+            {
+              "tag_name": "v1.0.153",
+              "name": null,
+              "body": null,
+              "published_at": null,
+              "assets": [
+                {
+                  "name": "Siya-AI-build-153.apk",
+                  "label": null,
+                  "browser_download_url": "https://github.com/AstraStudioz/Siya-Ai/releases/download/v1.0.153/Siya-AI-build-153.apk"
+                }
+              ]
+            }
+        """.trimIndent()
+
+        val info = UpdateManager.parseGitHubReleaseJson(jsonWithNulls)
+        assertNotNull("Should safely parse JSON with JsonNull fields without throwing exception", info)
+        assertEquals(153, info?.versionCode)
+        assertEquals("1.0.153", info?.versionName)
+        assertEquals("New release available.", info?.changelog)
+        assertEquals("https://github.com/AstraStudioz/Siya-Ai/releases/download/v1.0.153/Siya-AI-build-153.apk", info?.apkUrl)
     }
 
     @Test

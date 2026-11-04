@@ -39,6 +39,9 @@ class MicVoiceTestActivity : AppCompatActivity() {
         binding.btnBack.setOnClickListener {
             finish()
         }
+        binding.tvUnifiedFooter.setOnClickListener {
+            com.jarvis.assistant.util.ExternalLinks.open(this, com.jarvis.assistant.util.BrandConfig.TELEGRAM_CHANNEL_URL)
+        }
 
         binding.chipSensitivityLow.setOnClickListener {
             setSensitivity("low")

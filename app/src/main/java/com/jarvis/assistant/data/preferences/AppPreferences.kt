@@ -52,7 +52,7 @@ class AppPreferences(private val context: Context) {
         // Default operator identity: fill in the default when no name was saved, or when the
         // stored value is the old built-in placeholder. Any intentionally saved custom name is kept.
         val storedName = prefs.getString(KEY_USER_NAME, null)
-        if (storedName.isNullOrBlank() || storedName == LEGACY_OPERATOR_NAME || storedName == "ShivuOfc") {
+        if (storedName.isNullOrBlank() || storedName == LEGACY_OPERATOR_NAME || storedName == "Alpha Bits" || storedName == "TechGPT X") {
             prefs.edit().putString(KEY_USER_NAME, BrandConfig.DEFAULT_OPERATOR_NAME).apply()
         }
 

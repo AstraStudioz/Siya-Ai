@@ -54,15 +54,23 @@ class HandsFreeActivity : AppCompatActivity() {
         }
 
         binding.btnHandsFreeOfficialTelegram.setOnClickListener {
-            openUrl(BrandConfig.OFFICIAL_WEBSITE_URL)
+            openUrl(BrandConfig.TELEGRAM_CHANNEL_URL)
         }
 
         binding.btnHandsFreeDiscussion.setOnClickListener {
+            openUrl(BrandConfig.TELEGRAM_DISCUSSION_URL)
+        }
+
+        binding.btnHandsFreeWhatsApp.setOnClickListener {
+            openUrl(BrandConfig.WHATSAPP_CHANNEL_URL)
+        }
+
+        binding.btnHandsFreeYouTube.setOnClickListener {
             openUrl(BrandConfig.OFFICIAL_YOUTUBE_URL)
         }
 
         binding.tvFooterHandsFree.setOnClickListener {
-            openUrl(BrandConfig.OFFICIAL_WEBSITE_URL)
+            openUrl(BrandConfig.TELEGRAM_CHANNEL_URL)
         }
     }
 

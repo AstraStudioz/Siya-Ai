@@ -1480,14 +1480,34 @@
                 android:layout_marginBottom="16dp">
 
                 <ImageButton
-                    android:id="@+id/btnOfficialWebsite"
+                    android:id="@+id/btnOfficialTelegram"
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:background="@drawable/bg_jarvis_icon_square"
-                    android:src="@drawable/ic_official_website"
+                    android:src="@drawable/ic_social_telegram"
                     app:tint="?attr/themeAccent"
-                    android:contentDescription="Official Website"
-                    android:layout_marginEnd="16dp" />
+                    android:contentDescription="Telegram Channel"
+                    android:layout_marginEnd="12dp" />
+
+                <ImageButton
+                    android:id="@+id/btnOfficialDiscussion"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_jarvis_icon_square"
+                    android:src="@drawable/ic_chat_bubble"
+                    app:tint="?attr/themeAccent"
+                    android:contentDescription="Discussion Group"
+                    android:layout_marginEnd="12dp" />
+
+                <ImageButton
+                    android:id="@+id/btnOfficialWhatsApp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_jarvis_icon_square"
+                    android:src="@drawable/ic_social_whatsapp"
+                    app:tint="?attr/themeAccent"
+                    android:contentDescription="WhatsApp Community"
+                    android:layout_marginEnd="12dp" />
 
                 <ImageButton
                     android:id="@+id/btnOfficialYoutube"
@@ -1504,7 +1524,7 @@
                 android:id="@+id/tvFooterCredit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Siya Ai • Crafted by Alpha Bits • alphabits.site"
+                android:text="Siya Ai • Powered by Astra Studios"
                 android:textColor="?attr/themeTextMuted"
                 android:textSize="12sp"
                 android:fontFamily="sans-serif"

@@ -1,6 +1,6 @@
 # Siya AI (Android)
 
-Siya AI is an advanced on-device and cloud-connected AI assistant for Android created by Alpha Bits (`alphabits.site`).
+Siya AI is an advanced on-device and cloud-connected AI assistant for Android powered by Astra Studios and developed by ShivuOfc.
 
 ---
 
@@ -18,7 +18,7 @@ To sign your APK with a fixed keystore (allowing seamless updates over previous 
 | `KEY_PASSWORD` | Password for the key entry | e.g. `YourKeyPass123` |
 | `STORE_PASSWORD` | Password for the keystore | e.g. `YourStorePass123` |
 | `TG_BOT_TOKEN` | Telegram Bot API token (optional) | e.g. `123456789:ABCdefGhIJKlmNoPQRstuVWxYZ` |
-| `TG_CHAT_ID` | Telegram Channel / Chat ID (optional) | e.g. `@alphabit_s` or `-1001234567890` |
+| `TG_CHAT_ID` | Telegram Channel / Chat ID (optional) | e.g. `@AstraStudiosPvt` or `-1001234567890` |
 
 *Note*: If `KEYSTORE_BASE64` is not configured, the workflow generates a temporary keystore so development builds still succeed.
 

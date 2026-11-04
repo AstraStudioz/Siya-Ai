@@ -35,6 +35,9 @@ class OverlayAvatarActivity : AppCompatActivity() {
         preferences.taskOverlayAvatar = "siya"
 
         findViewById<android.view.View>(R.id.btnBack).setOnClickListener { finish() }
+        findViewById<android.view.View>(R.id.tvUnifiedFooter)?.setOnClickListener {
+            com.jarvis.assistant.util.ExternalLinks.open(this, com.jarvis.assistant.util.BrandConfig.TELEGRAM_CHANNEL_URL)
+        }
         overlaySwitch = findViewById(R.id.switchOverlayEnabled)
         overlaySwitch.isChecked = preferences.isTaskOverlayEnabled
         val modeGroup = findViewById<RadioGroup>(R.id.radioOverlayMode)

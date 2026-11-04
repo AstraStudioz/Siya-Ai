@@ -80,6 +80,9 @@ class VoiceEnrollmentActivity : AppCompatActivity() {
         com.jarvis.assistant.util.ThemeManager.applyDynamicBackground(binding.root)
 
         binding.btnBack.setOnClickListener { finish() }
+        binding.tvUnifiedFooter.setOnClickListener {
+            com.jarvis.assistant.util.ExternalLinks.open(this, com.jarvis.assistant.util.BrandConfig.TELEGRAM_CHANNEL_URL)
+        }
 
         // Initialize Vosk models if not ready
         VoskModelManager.init(applicationContext, lifecycleScope)

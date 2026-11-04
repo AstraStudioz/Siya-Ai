@@ -41,6 +41,10 @@ class PrivacyShieldActivity : AppCompatActivity() {
             ExternalLinks.open(this, BrandConfig.TELEGRAM_CHANNEL_URL)
         }
 
+        binding.tvUnifiedFooter.setOnClickListener {
+            ExternalLinks.open(this, BrandConfig.TELEGRAM_CHANNEL_URL)
+        }
+
         binding.btnExportMyData.setOnClickListener {
             exportUserData()
         }

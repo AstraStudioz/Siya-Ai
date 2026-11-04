@@ -465,7 +465,7 @@ class ImageGenClient(
         val postReq = Request.Builder()
             .url("https://aihorde.net/api/v2/generate/async")
             .addHeader("apikey", "0000000000")
-            .addHeader("Client-Agent", "SiyaAi:1.0:alphabits.site")
+            .addHeader("Client-Agent", "SiyaAi:1.0:AstraStudios")
             .post(requestJson.toString().toRequestBody("application/json; charset=utf-8".toMediaType()))
             .build()
 
@@ -485,7 +485,7 @@ class ImageGenClient(
                 try { Thread.sleep(2000L) } catch (_: InterruptedException) { break }
                 val checkReq = Request.Builder()
                     .url(checkUrl)
-                    .addHeader("Client-Agent", "SiyaAi:1.0:alphabits.site")
+                    .addHeader("Client-Agent", "SiyaAi:1.0:AstraStudios")
                     .get()
                     .build()
                 client.newCall(checkReq).execute().use { resp ->

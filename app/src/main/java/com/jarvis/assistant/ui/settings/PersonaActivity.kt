@@ -34,6 +34,9 @@ class PersonaActivity : AppCompatActivity() {
         binding.btnBack.setOnClickListener {
             finish()
         }
+        binding.tvUnifiedFooter.setOnClickListener {
+            com.jarvis.assistant.util.ExternalLinks.open(this, BrandConfig.TELEGRAM_CHANNEL_URL)
+        }
     }
 
     private fun loadInitialState() {

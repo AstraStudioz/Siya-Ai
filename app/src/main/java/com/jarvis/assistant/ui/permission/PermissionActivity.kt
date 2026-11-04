@@ -57,6 +57,9 @@ class PermissionActivity : AppCompatActivity() {
         binding.btnBack.setOnClickListener {
             finish()
         }
+        binding.tvUnifiedFooter.setOnClickListener {
+            com.jarvis.assistant.util.ExternalLinks.open(this, com.jarvis.assistant.util.BrandConfig.TELEGRAM_CHANNEL_URL)
+        }
         addExtraPermissionCards()
 
         binding.btnGrantMic.setOnClickListener {

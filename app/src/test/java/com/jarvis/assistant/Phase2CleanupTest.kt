@@ -76,10 +76,14 @@ class Phase2CleanupTest {
 
     @Test
     fun testOfficialLinksAndUnifiedFooterConstants() {
-        assertEquals("https://alphabits.site/", BrandConfig.OFFICIAL_WEBSITE_URL)
-        assertEquals("https://www.youtube.com/@alphabit_s", BrandConfig.OFFICIAL_YOUTUBE_URL)
-        assertEquals("Alpha Bits", BrandConfig.CRAFTED_BY)
-        assertEquals("Siya Ai • Crafted by Alpha Bits • alphabits.site", BrandConfig.UNIFIED_FOOTER_TEXT)
+        assertEquals("https://t.me/AstraStudiosPvt", BrandConfig.OFFICIAL_WEBSITE_URL)
+        assertEquals("https://youtube.com/@astrastudiospvt?si=7rjDrOpnLr-Ch1ws", BrandConfig.OFFICIAL_YOUTUBE_URL)
+        assertEquals("https://t.me/AstraStudiosPvt", BrandConfig.TELEGRAM_CHANNEL_URL)
+        assertEquals("https://t.me/StudioxDiscussion", BrandConfig.TELEGRAM_DISCUSSION_URL)
+        assertEquals("https://whatsapp.com/channel/0029VbE9XJN5EjxqdhXWXQ0f", BrandConfig.WHATSAPP_CHANNEL_URL)
+        assertEquals("Astra Studios", BrandConfig.CRAFTED_BY)
+        assertEquals("ShivuOfc", BrandConfig.DEVELOPER_NAME)
+        assertEquals("Siya Ai • Powered by Astra Studios", BrandConfig.UNIFIED_FOOTER_TEXT)
     }
 
     @Test
@@ -108,12 +112,13 @@ class Phase2CleanupTest {
     }
 
     @Test
-    fun testPromptGenerator_noShivuOfcReferences() {
+    fun testPromptGenerator_brandingReferences() {
         val file = File("src/main/java/com/jarvis/assistant/util/PromptGenerator.kt")
         assertTrue("PromptGenerator.kt must exist", file.exists())
         val content = file.readText()
-        assertFalse("PromptGenerator.kt must not contain old creator name 'ShivuOfc'", content.contains("ShivuOfc"))
-        assertTrue("PromptGenerator.kt must reference Alpha Bits", content.contains("Alpha Bits"))
+        assertTrue("PromptGenerator.kt must contain creator name 'ShivuOfc'", content.contains("ShivuOfc"))
+        assertTrue("PromptGenerator.kt must reference Astra Studios", content.contains("Astra Studios"))
+        assertFalse("PromptGenerator.kt must not contain old creator name 'Alpha Bits'", content.contains("Alpha Bits"))
     }
 
     @Test

@@ -258,18 +258,26 @@ class SettingsFragment : Fragment() {
             startActivity(Intent(requireContext(), PrivacyShieldActivity::class.java))
         }
 
-        // Official Links: Website & YouTube
-        binding.btnOfficialWebsite.setOnClickListener {
-            openUrl(BrandConfig.OFFICIAL_WEBSITE_URL)
+        // Official Links: Telegram, Discussion, WhatsApp & YouTube
+        binding.btnOfficialTelegram.setOnClickListener {
+            openUrl(BrandConfig.TELEGRAM_CHANNEL_URL)
+        }
+
+        binding.btnOfficialDiscussion.setOnClickListener {
+            openUrl(BrandConfig.TELEGRAM_DISCUSSION_URL)
+        }
+
+        binding.btnOfficialWhatsApp.setOnClickListener {
+            openUrl(BrandConfig.WHATSAPP_CHANNEL_URL)
         }
 
         binding.btnOfficialYoutube.setOnClickListener {
             openUrl(BrandConfig.OFFICIAL_YOUTUBE_URL)
         }
 
-        // Attribution footer opens the official website
+        // Attribution footer opens Telegram channel
         binding.tvFooterCredit.setOnClickListener {
-            openUrl(BrandConfig.OFFICIAL_WEBSITE_URL)
+            openUrl(BrandConfig.TELEGRAM_CHANNEL_URL)
         }
     }
 
