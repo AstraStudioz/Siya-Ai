@@ -70,10 +70,12 @@ object UpdateManager {
     val availableUpdateFlow: StateFlow<UpdateInfo?> = _availableUpdateFlow.asStateFlow()
 
     init {
-        // Hydrate from cached preference on process launch
-        val cached = JarvisApp.instance.preferences.getCachedUpdateInfo()
-        if (cached != null && cached.versionCode > BuildConfig.VERSION_CODE) {
-            _availableUpdateFlow.value = cached
+        // Hydrate from cached preference on process launch (guarded for unit test environments)
+        runCatching {
+            val cached = JarvisApp.instance.preferences.getCachedUpdateInfo()
+            if (cached != null && cached.versionCode > BuildConfig.VERSION_CODE) {
+                _availableUpdateFlow.value = cached
+            }
         }
     }
 

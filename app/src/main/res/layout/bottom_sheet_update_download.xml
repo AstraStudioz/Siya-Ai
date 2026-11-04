@@ -183,7 +183,7 @@
                     android:layout_width="22dp"
                     android:layout_height="22dp"
                     android:layout_gravity="center"
-                    android:src="@drawable/ic_share"
+                    android:src="@drawable/ic_social_telegram"
                     app:tint="?attr/themeAccent"
                     android:contentDescription="Telegram Download" />
             </FrameLayout>

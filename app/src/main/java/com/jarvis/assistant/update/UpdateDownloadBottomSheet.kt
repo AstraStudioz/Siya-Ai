@@ -36,8 +36,6 @@ class UpdateDownloadBottomSheet(
     private var downloadedApkFile: File? = null
     private lateinit var downloader: UpdateDownloader
 
-    override fun getTheme(): Int = R.style.JarvisBottomSheetDialogTheme
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

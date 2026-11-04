@@ -8,6 +8,9 @@ import androidx.fragment.app.Fragment
 import android.util.TypedValue
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import com.jarvis.assistant.databinding.FragmentUpdatesBinding
 
 class UpdatesFragment : Fragment() {
